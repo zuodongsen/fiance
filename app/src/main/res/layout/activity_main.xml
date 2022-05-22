@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+
+        android:layout_width="match_parent"
+        android:layout_height="35dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_menu"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/golden"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme"
+            app:popupTheme="@style/Theme.Finance.PopupOverlay" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/bt_left"
+                    android:layout_width="50dp"
+                    android:layout_height="30dp"
+                    android:layout_toLeftOf="@id/text_month"
+                    android:background="@android:color/transparent"
+                    android:onClick="btn_dateChange"
+                    android:text="@string/left" />
+
+                <TextView
+                    android:id="@+id/text_month"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="3dp"
+                    android:text="month"
+                    android:textSize="20sp" />
+
+                <Button
+                    android:id="@+id/bt_right"
+                    android:layout_width="50dp"
+                    android:layout_height="30dp"
+                    android:layout_toRightOf="@id/text_month"
+                    android:background="@android:color/transparent"
+                    android:onClick="btn_dateChange"
+                    android:text="@string/right" />
+
+                <TextView
+                    android:id="@+id/text_total_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@id/bt_create"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_toRightOf="@id/bt_right"
+                    android:text="total_a"
+                    android:textSize="24sp" />
+
+                <Button
+                    android:id="@+id/bt_create"
+                    android:layout_width="40dp"
+                    android:layout_height="35dp"
+                    android:background="@android:color/transparent"
+                    android:backgroundTint="@null"
+                    android:onClick="btn_create"
+                    android:paddingTop="0dp"
+                    android:text="+"
+                    android:textSize="24sp" />
+            </RelativeLayout>
+
+            <ListView
+                android:id="@+id/list_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:background="#FFFFFF" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,0 +1,26 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.zds.finance.MainActivity">
+    <item
+        android:id="@+id/menu_inport"
+        android:actionLayout="@layout/actionbar_badge_layout"
+        android:alphabeticModifiers="SHIFT"
+        android:orderInCategory="1"
+        android:title="@string/inport"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_export"
+        android:actionLayout="@layout/actionbar_badge_layout"
+        android:orderInCategory="2"
+        android:title="@string/export"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_deletebackup"
+        android:orderInCategory="3"
+        android:title="@string/deletebackup" />
+    <item
+        android:id="@+id/menu_uploadbackup"
+        android:orderInCategory="4"
+        android:title="@string/uploadbackup" />
+</menu>
