@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
     private static String FILE_FOLDER;
     private static String BACKUP_FILE_FOLDER;
     private static final String BACKUP_PATH = "amount_backup";
-    private static final String FILE_CSV = "about_data.csv";
 
 
     @Override
@@ -69,47 +68,6 @@ public class MainActivity extends AppCompatActivity {
         this.initSelectYearMonth();
         this.initListView();
         this.initPopListView();
-//        List<Finance> allFormDb = Finance.getAllFormDb(MainActivity.this);
-//        List<Finance> allFinalces = new ArrayList<>();
-//        allFinalces.add(new Finance(35, "话费", 1643644800000L, 100.00F));
-//        allFinalces.add(new Finance(34, "oppok9钢化膜", 1644422400000L, 9.80F));
-//        allFinalces.add(new Finance(33, "公牛usb插座", 1644940800000L, 56.00F));
-//        allFinalces.add(new Finance(32, "话费", 1646150400000L, 97.50F));
-//        allFinalces.add(new Finance(31, "农用搂地松土大铁耙", 1646409600000L, 19.90F));
-//        allFinalces.add(new Finance(30, "昂刺鱼，豆腐，里脊肉", 1646496000000L, 116.52F));
-//        allFinalces.add(new Finance(28, "椰糠", 1646841600000L, 25.90F));
-//        allFinalces.add(new Finance(29, "种菜箱", 1646841600000L, 194.52F));
-//        allFinalces.add(new Finance(26, "优酷会员年卡", 1646928000000L, 198.62F));
-//        allFinalces.add(new Finance(27, "茉莉花", 1646928000000L, 40.00F));
-//        allFinalces.add(new Finance(24, "茉莉花", 1647014400000L, 60.00F));
-//        allFinalces.add(new Finance(25, "肉，鱼，鲍鱼，豆腐，蔬菜", 1647014400000L, 178.62F));
-//        allFinalces.add(new Finance(22, "椰砖", 1647100800000L, 42.40F));
-//        allFinalces.add(new Finance(23, "猪腿骨，鸡蛋", 1647100800000L, 84.72F));
-//        allFinalces.add(new Finance(20, "封小区前夜买菜", 1647187200000L, 182.30F));
-//        allFinalces.add(new Finance(21, "地铁卡充值", 1647187200000L, 200.00F));
-//        allFinalces.add(new Finance(18, "小米笔记本电脑", 1647360000000L, 4797.00F));
-//        allFinalces.add(new Finance(19, "无线鼠标", 1647360000000L, 79.00F));
-//        allFinalces.add(new Finance(17, "爸爸代卖菜", 1647705600000L, 200.00F));
-//        allFinalces.add(new Finance(15, "鸡脚鸡翅鱼甘蔗", 1647964800000L, 143.00F));
-//        allFinalces.add(new Finance(16, "电脑膜键盘膜", 1647964800000L, 59.53F));
-//        allFinalces.add(new Finance(14, "大蒜包菜甘蔗", 1648137600000L, 45.72F));
-//        allFinalces.add(new Finance(12, "88菜两份", 1648915200000L, 176.00F));
-//        allFinalces.add(new Finance(13, "牛奶榨菜", 1648915200000L, 153.60F));
-//        allFinalces.add(new Finance(11, "多力葵花籽油", 1649001600000L, 206.00F));
-//        allFinalces.add(new Finance(9, "面份，面条，芝麻", 1649088000000L, 63.10F));
-//        allFinalces.add(new Finance(10, "叮咚买菜", 1649088000000L, 62.59F));
-//        allFinalces.add(new Finance(8, "葵花籽油，或者玉米油 5L：2桶 盐 面粉", 1649952000000L, 463.40F));
-//        allFinalces.add(new Finance(7, "花菜，黄瓜，西虹市，茄子", 1650124800000L, 79.72F));
-//        allFinalces.add(new Finance(6, "牛心菜，菇", 1650297600000L, 22.72F));
-//        allFinalces.add(new Finance(4, "超市", 1651075200000L, 245.90F));
-//        allFinalces.add(new Finance(5, "豆制品大礼包", 1651075200000L, 58.00F));
-//        allFinalces.add(new Finance(3, "门口买菜", 1651248000000L, 103.00F));
-//        allFinalces.add(new Finance(2, "话费", 1651420800000L, 94.80F));
-//        allFinalces.add(new Finance(1, "超市买菜", 1651939200000L, 336.20F));
-//
-//        for(Finance it : allFinalces) {
-//            Finance.insertToDb(MainActivity.this, it);
-//        }
     }
 
     @Override
