@@ -17,10 +17,15 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/menu_deletebackup"
+        android:actionLayout="@layout/actionbar_badge_layout"
         android:orderInCategory="3"
-        android:title="@string/deletebackup" />
+        android:title="@string/deletebackup"
+        app:showAsAction="never" />/>
+
     <item
         android:id="@+id/menu_uploadbackup"
+        android:actionLayout="@layout/actionbar_badge_layout"
         android:orderInCategory="4"
-        android:title="@string/uploadbackup" />
+        android:title="@string/uploadbackup"
+        app:showAsAction="never" />/>
 </menu>

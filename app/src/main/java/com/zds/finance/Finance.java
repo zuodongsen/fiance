@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.view.View;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.text.ParseException;
@@ -19,6 +20,7 @@ public class Finance {
         this.date = 0;
         this.id = 0;
         this.amount = 0;
+        this.type = 0;
     }
 
     public Finance(String name_, Date date_, float amount_) {
@@ -27,43 +29,39 @@ public class Finance {
         this.amount = amount_;
     }
 
-    public Finance(String name_, String date_, float amount_) {
+    public Finance(String name_, String date_, float amount_, int type_) {
         this.info = name_;
         this.date = getString2Date(date_);
         this.id = 0;
         this.amount = amount_;
+        this.type = type_;
     }
 
-//    public Finance(int id_, String name_, String date_, float amount_) {
-//        this.id = id_;
-//        this.info = name_;
-//        this.date = getString2Date(date_);
-//        this.amount = amount_;
-//    }
-
-    public Finance(int id_, String name_, long date_, float amount_) {
+    public Finance(int id_, String name_, long date_, float amount_, int type_) {
         this.id = id_;
         this.info = name_;
         this.date = date_;
         this.amount = amount_;
-        this.type = 0;
+        this.type = type_;
     }
 
     public String getInfo() {
         return this.info;
     }
 
-    public void setHolder(TextView txtVeiwName_, TextView txtViewId_, TextView txtAmound_) {
+    public void setHolder(TextView txtVeiwName_, TextView txtViewId_, TextView txtAmound_, TextView txtType_) {
         txtVeiwName_.setText(this.info);
         txtViewId_.setText(String.valueOf(this.id));
         txtAmound_.setText(String.valueOf(this.amount));
+        txtType_.setText(CreateActivity.amountType[this.type]);
     }
 
-    public void setHolder(TextView txtVeiwName_, TextView txtViewId_, TextView txtAmound_, TextView txtDate_) {
+    public void setHolder(TextView txtVeiwName_, TextView txtViewId_, TextView txtAmound_, TextView txtType_, TextView txtDate_) {
         txtVeiwName_.setText(this.info);
         txtViewId_.setText(String.valueOf(this.id));
         txtAmound_.setText(String.valueOf(this.amount));
         txtDate_.setVisibility(View.VISIBLE);
+        txtType_.setText(CreateActivity.amountType[this.type]);
         txtDate_.setText(this.getDate2String());
     }
 
@@ -144,7 +142,8 @@ public class Finance {
             return null;
         }
         while(cursor.moveToNext()) {
-            Finance finance = new Finance(cursor.getInt(0), cursor.getString(1), cursor.getLong(2), cursor.getFloat(3));
+            Finance finance = new Finance(cursor.getInt(0), cursor.getString(1),
+                    cursor.getLong(2), cursor.getFloat(3), cursor.getInt(4));
             allFinances.add(finance);
         }
         return allFinances.get(0);
@@ -164,7 +163,8 @@ public class Finance {
             return allFinances;
         }
         while(cursor.moveToNext()) {
-            Finance finance = new Finance(cursor.getInt(0), cursor.getString(1), cursor.getLong(2), cursor.getFloat(3));
+            Finance finance = new Finance(cursor.getInt(0), cursor.getString(1),
+                    cursor.getLong(2), cursor.getFloat(3), cursor.getInt(4));
             allFinances.add(finance);
         }
 
@@ -180,7 +180,8 @@ public class Finance {
             return allFinances;
         }
         while(cursor.moveToNext()) {
-            Finance finance = new Finance(cursor.getInt(0), cursor.getString(1), cursor.getLong(2), cursor.getFloat(3));
+            Finance finance = new Finance(cursor.getInt(0), cursor.getString(1),
+                    cursor.getLong(2), cursor.getFloat(3), cursor.getInt(4));
             allFinances.add(finance);
         }
 

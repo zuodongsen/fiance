@@ -51,12 +51,14 @@ public class FinanceAdapter extends ArrayAdapter<Finance> {
             finance.setHolder(
                     (TextView)view.findViewById(R.id.txtfinance_info),
                     (TextView)view.findViewById(R.id.txtfinance_id),
-                    (TextView)view.findViewById(R.id.txtfinance_amount));
+                    (TextView)view.findViewById(R.id.txtfinance_amount),
+                    (TextView)view.findViewById(R.id.txtfinance_type));
         }else {
             finance.setHolder(
                     (TextView)view.findViewById(R.id.txtfinance_info),
                     (TextView)view.findViewById(R.id.txtfinance_id),
                     (TextView)view.findViewById(R.id.txtfinance_amount),
+                    (TextView)view.findViewById(R.id.txtfinance_type),
                     (TextView)view.findViewById(R.id.txtfinance_date));
         }
 

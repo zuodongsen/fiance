@@ -24,7 +24,7 @@
         <EditText
             android:id="@+id/textedit_date"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
             android:layout_weight="1"
             android:background="@drawable/textview_border"
             android:editable="false"
@@ -55,11 +55,13 @@
             android:text="@string/type"
             android:textSize="20sp" />
 
-        <EditText
-            android:id="@+id/textedit_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+        <Spinner
+            android:id="@+id/spn_type"
+            style="@style/Widget.AppCompat.Spinner.Underlined"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:padding="0dp" />
     </LinearLayout>
 
     <LinearLayout
