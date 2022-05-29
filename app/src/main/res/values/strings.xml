@@ -20,6 +20,7 @@
     <string name="inport">"导入"</string>
     <string name="deletebackup">"删除备份"</string>
     <string name="uploadbackup">"上传备份"</string>
+    <string name="remoteexport">"远程导入"</string>
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 </resources>

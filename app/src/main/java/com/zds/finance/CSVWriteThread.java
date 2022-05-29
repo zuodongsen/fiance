@@ -56,8 +56,9 @@ public class CSVWriteThread extends Thread{
         try {
             FileOutputStream os = new FileOutputStream(file, true);
             for(String it : this.data) {
-                System.out.println(it);
-                os.write(it.getBytes(StandardCharsets.UTF_8));
+                os.write(it.getBytes());
+                os.write("\r\n".getBytes());
+
             }
 
             os.flush();

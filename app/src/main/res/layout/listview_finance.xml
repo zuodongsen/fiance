@@ -23,9 +23,11 @@
 
     <TextView
         android:id="@+id/txtfinance_info"
-        android:layout_width="200dp"
+        android:layout_width="260dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:ellipsize="end"
+        android:lines="1"
+        android:maxLength="18"
         android:textSize="16sp" />
 
     <TextView
@@ -33,6 +35,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_weight="1"
         android:textSize="16sp" />
 </LinearLayout>

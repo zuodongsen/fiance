@@ -15,7 +15,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     public DataBaseHelper(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
-        createTableCmdList.add("create table finance (id integer primary key, name varchar(20), date integer, amount float(10, 8), type integer)");
+        createTableCmdList.add("create table finance (id integer primary key, name varchar(200), date integer, amount float(10, 8), type integer)");
     }
 
     @Override

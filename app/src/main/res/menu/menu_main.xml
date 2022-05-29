@@ -27,5 +27,9 @@
         android:actionLayout="@layout/actionbar_badge_layout"
         android:orderInCategory="4"
         android:title="@string/uploadbackup"
-        app:showAsAction="never" />/>
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_remoteexport"
+        android:orderInCategory="5"
+        android:title="@string/remoteexport" />/>
 </menu>

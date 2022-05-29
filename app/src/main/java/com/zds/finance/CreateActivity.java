@@ -20,7 +20,13 @@ public class CreateActivity extends AppCompatActivity {
     private Spinner spnType;
     public static final String[] amountType = new String[] {"买菜", "话费", "保险", "医疗",
                                                             "交通", "养车", "服装", "长辈",
-                                                            "居家", "养娃", "书籍", "其他"};
+                                                            "居家", "养娃", "书籍", "电子",
+                                                            "其他"};
+
+    public static final String[] amountType_old = new String[] {"买菜", "话费", "保险", "医疗",
+                                                                "交通", "养车", "服装", "长辈",
+                                                                "居家", "养娃", "书籍", "电子",
+                                                                "其他"};
 
     Calendar calendar = null;
     int year = 0; // 得到当前年

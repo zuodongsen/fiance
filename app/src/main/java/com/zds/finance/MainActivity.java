@@ -1,18 +1,14 @@
 package com.zds.finance;
 
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
-import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +18,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.zds.finance.databinding.ActivityMainBinding;
 
@@ -51,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     static PopupWindow popWin;
     static int selectListViewItemId;
     static int selectFileIndexForInput;
+    static int selectFileIndexForUpload;
+    static int selectFileIndexForRemoteInput;
     static List<Integer> selectFileIndexForDelete = new ArrayList<>();
     static List<String> backupFileNameList = new ArrayList<>();
 
@@ -59,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private static String FILE_FOLDER;
     private static String BACKUP_FILE_FOLDER;
     private static final String BACKUP_PATH = "amount_backup";
+    public static Handler handler;
 
 
     @Override
@@ -68,16 +68,28 @@ public class MainActivity extends AppCompatActivity {
         this.initSelectYearMonth();
         this.initListView();
         this.initPopListView();
+        this.initHandler();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-
         return super.onCreateOptionsMenu(menu);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        this.reflushListViewData();
+    }
+
+    /* menu bar */
+
+    private static final int FILE_LIST_TYPE_INPUT = 0;
+    private static final int FILE_LIST_TYPE_DELETE = 1;
+    private static final int FILE_LIST_TYPE_UPLOAD = 2;
+    private static final int FILE_LIST_TYPE_REMOTEINPUT = 3;
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -90,7 +102,10 @@ public class MainActivity extends AppCompatActivity {
             CSVWriteThread csvWriteThread = new CSVWriteThread(dataInfos, BACKUP_FILE_FOLDER, "amount_" + Finance.getNowDateTime2String() + ".csv");
             csvWriteThread.run();
             return true;
-        }else if(id == R.id.menu_inport || id == R.id.menu_deletebackup) {
+        }else if(id == R.id.menu_remoteexport) {
+            FtpFile ftpFileUpload = new FtpFile("192.168.1.7", 21, "dosens", "123456");
+            ftpFileUpload.start();
+        }else {
             File fileDir = new File(BACKUP_FILE_FOLDER);
             File[] files = fileDir.listFiles();
             for(File f : files) {
@@ -101,18 +116,14 @@ public class MainActivity extends AppCompatActivity {
             String[] backupFileNameStrArr = new String[MainActivity.backupFileNameList.size()];
             MainActivity.backupFileNameList.toArray(backupFileNameStrArr);
             if(id == R.id.menu_inport) {
-                this.showFileListDialog("导入备份文件", backupFileNameStrArr, 0);
-            }else {
-                this.showFileListDialog("删除备份文件", backupFileNameStrArr, 1);
+                this.showFileListDialog("导入备份文件", backupFileNameStrArr, FILE_LIST_TYPE_INPUT);
+            }else if(id == R.id.menu_deletebackup) {
+                this.showFileListDialog("删除备份文件", backupFileNameStrArr, FILE_LIST_TYPE_DELETE);
+            }else if(id == R.id.menu_uploadbackup) {
+                this.showFileListDialog("上传备份文件", backupFileNameStrArr, FILE_LIST_TYPE_UPLOAD);
             }
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        this.reflushListViewData();
     }
 
     private void initMenuBar() {
@@ -124,59 +135,17 @@ public class MainActivity extends AppCompatActivity {
         this.resetFileListSelect();
     }
 
-    private void initSelectYearMonth() {
-        Calendar calendar = Calendar.getInstance();
-        this.selectYear = calendar.get(Calendar.YEAR); // 得到当前年
-        this.selectMonth = calendar.get(Calendar.MONTH) + 1; // 得到当前月
-        this.textMonth = (TextView) findViewById(R.id.text_month);
-        this.textTotalAmount = (TextView) findViewById(R.id.text_total_amount);
-    }
-
-    private void initListView() {
-        this.resetPopListSelect();
-        this.listView = (ListView)findViewById(R.id.list_view);
-        this.reflushListViewData();
-    }
-
-    private void showDeleteAlertDialog(String title){
-        new AlertDialog.Builder(MainActivity.this)
-                .setTitle(title)
-                .setIcon(android.R.drawable.ic_delete)
-                .setMessage("确定吗")
-                .setPositiveButton("是", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Finance.deleteFromDb(MainActivity.this, MainActivity.selectListViewItemId);
-                        MainActivity.this.reflushListViewData();
-                        MainActivity.this.resetPopListSelect();
-                    }
-                })
-                .setNegativeButton("否", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        MainActivity.this.resetPopListSelect();
-                    }
-                })
-                .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialogInterface) {
-                        MainActivity.this.resetPopListSelect();
-                    }
-                })
-                .show();
-    }
-
-    private void showFileListDialog(String title, String[] fileList, int mode/* 0 select, 1 delete */){
+    private void showFileListDialog(String title, String[] fileList, int mode/* 0 select, 1 delete, 2 upload, 3 remote input*/){
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle(title);
         builder.setIcon(android.R.drawable.ic_dialog_info);
-        if(mode == 0) {
+        if(mode == FILE_LIST_TYPE_INPUT) {
             builder.setSingleChoiceItems(fileList, -1, new DialogInterface.OnClickListener(){
                 public void onClick(DialogInterface arg0, int arg1) {
                     MainActivity.selectFileIndexForInput = arg1;
                 }
             });
-        }else {
+        }else if(mode == FILE_LIST_TYPE_DELETE) {
             builder.setMultiChoiceItems(fileList, null, new DialogInterface.OnMultiChoiceClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i, boolean b) {
@@ -187,79 +156,80 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             });
+        }else if(mode == FILE_LIST_TYPE_UPLOAD){
+            builder.setSingleChoiceItems(fileList, -1, new DialogInterface.OnClickListener(){
+                public void onClick(DialogInterface arg0, int arg1) {
+                    MainActivity.selectFileIndexForUpload = arg1;
+                }
+            });
+        }else if(mode == FILE_LIST_TYPE_REMOTEINPUT){
+            builder.setSingleChoiceItems(fileList, -1, new DialogInterface.OnClickListener(){
+                public void onClick(DialogInterface arg0, int arg1) {
+                    MainActivity.selectFileIndexForRemoteInput = arg1;
+                }
+            });
         }
 
-
         builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        if(MainActivity.selectFileIndexForInput != INVALID_FILE_SELECT_ID) {
-                            System.out.println("now to input backup file: " + MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForInput));
-                        }else if(!MainActivity.selectFileIndexForDelete.isEmpty()){
-                            for(Integer it : MainActivity.selectFileIndexForDelete) {
-                                CSVWriteThread.deleteFile(BACKUP_FILE_FOLDER, MainActivity.backupFileNameList.get(it));
-                            }
-                        }
-                        MainActivity.this.resetFileListSelect();
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if(MainActivity.selectFileIndexForInput != INVALID_FILE_SELECT_ID) {
+                    System.out.println("now to input backup file: " + MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForInput));
+                }else if(!MainActivity.selectFileIndexForDelete.isEmpty()){
+                    for(Integer it : MainActivity.selectFileIndexForDelete) {
+                        CSVWriteThread.deleteFile(BACKUP_FILE_FOLDER, MainActivity.backupFileNameList.get(it));
                     }
-                });
+                }else if(MainActivity.selectFileIndexForUpload != INVALID_FILE_SELECT_ID) {
+                    FtpFile ftpFileUpload = new FtpFile("192.168.1.7", 21, "dosens", "123456",
+                            BACKUP_FILE_FOLDER + File.separator,
+                            MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForUpload), FtpFile.FTP_TYPE_UPLOAD);
+                    ftpFileUpload.start();
+                }else if(MainActivity.selectFileIndexForRemoteInput != INVALID_FILE_SELECT_ID) {
+                    FtpFile ftpFileUpload = new FtpFile("192.168.1.7", 21, "dosens", "123456",
+                            BACKUP_FILE_FOLDER + File.separator,
+                            MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForRemoteInput), FtpFile.FTP_TYPE_DOWNLOAD);
+                    ftpFileUpload.start();
+                }
+                MainActivity.this.resetFileListSelect();
+            }
+        });
         builder.setNegativeButton("否", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        MainActivity.this.resetFileListSelect();
-                    }
-                });
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                MainActivity.this.resetFileListSelect();
+            }
+        });
         builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialogInterface) {
-                        MainActivity.this.resetFileListSelect();
-                    }
-                });
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                MainActivity.this.resetFileListSelect();
+            }
+        });
         builder.show();
     }
 
-    private void initPopListView() {
-        this.popListView = new ListView(MainActivity.this);
-        this.popListView.setDivider(null);
-        this.popListView.setVerticalScrollBarEnabled(false);
-        this.popListView.setAdapter(new PopListViewAdapter(popListData, MainActivity.this, R.layout.poplistview_item));
-        this.popListView.setBackgroundResource(R.drawable.textview_border);
-
-        popWin = new PopupWindow(MainActivity.this);
-        popWin.setWidth(200);//设置宽度 和编辑框的宽度相同
-        popWin.setHeight(200);
-        popWin.setContentView(popListView);
-        popWin.setOutsideTouchable(true);
-
-        popWin.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                if(MainActivity.selectListViewItemId == INVALID_LIST_VIEW_ITEM_ID){
-                    return;
-                }
-                if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_INVALID) {
-                    MainActivity.selectListViewItemId = INVALID_LIST_VIEW_ITEM_ID;
-                    return;
-                }
-                if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_DEL) {
-                    MainActivity.this.showDeleteAlertDialog("删除记账！");
-                }else {
-                    Intent intent = new Intent(MainActivity.this, CreateActivity.class);
-                    startActivityForResult(intent, REQUEST);
-                }
-            }
-        });
-    }
-
-    private void resetPopListSelect() {
-        MainActivity.selectListViewItemId = INVALID_LIST_VIEW_ITEM_ID;
-        PopListViewAdapter.selectCmd = PopListViewAdapter.CMD_INVALID;
-    }
-
     private void resetFileListSelect() {
+        MainActivity.selectFileIndexForUpload = INVALID_FILE_SELECT_ID;
         MainActivity.selectFileIndexForInput = INVALID_FILE_SELECT_ID;
+        MainActivity.selectFileIndexForRemoteInput = INVALID_FILE_SELECT_ID;
         MainActivity.selectFileIndexForDelete.clear();
         MainActivity.backupFileNameList.clear();
+    }
+
+    /*  */
+    private void initSelectYearMonth() {
+        Calendar calendar = Calendar.getInstance();
+        this.selectYear = calendar.get(Calendar.YEAR); // 得到当前年
+        this.selectMonth = calendar.get(Calendar.MONTH) + 1; // 得到当前月
+        this.textMonth = (TextView) findViewById(R.id.text_month);
+        this.textTotalAmount = (TextView) findViewById(R.id.text_total_amount);
+    }
+
+    /* listview */
+    private void initListView() {
+        this.resetPopListSelect();
+        this.listView = (ListView)findViewById(R.id.list_view);
+        this.reflushListViewData();
     }
 
     private void genFinanceDateList() {
@@ -302,6 +272,128 @@ public class MainActivity extends AppCompatActivity {
         this.textTotalAmount.setText(String.format("%.2f", this.tatalAmount));
     }
 
+    // 解决listview 只能显示一条记录的问题
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null) {
+            return;
+        }
+
+        int totalHeight = 0;
+        for (int i = 0, len = listAdapter.getCount(); i < len; i++) { // listAdapter.getCount()返回数据项的数目
+            View listItem = listAdapter.getView(i, null, listView);
+            listItem.measure(0, 0); // 计算子项View 的宽高
+            totalHeight += listItem.getMeasuredHeight(); // 统计所有子项的总高度
+        }
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+    }
+
+
+    /* pop list */
+    private void initPopListView() {
+        this.popListView = new ListView(MainActivity.this);
+        this.popListView.setDivider(null);
+        this.popListView.setVerticalScrollBarEnabled(false);
+        this.popListView.setAdapter(new PopListViewAdapter(popListData, MainActivity.this, R.layout.poplistview_item));
+        this.popListView.setBackgroundResource(R.drawable.textview_border);
+
+        popWin = new PopupWindow(MainActivity.this);
+        popWin.setWidth(200);//设置宽度 和编辑框的宽度相同
+        popWin.setHeight(200);
+        popWin.setContentView(popListView);
+        popWin.setOutsideTouchable(true);
+
+        popWin.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                if(MainActivity.selectListViewItemId == INVALID_LIST_VIEW_ITEM_ID){
+                    return;
+                }
+                if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_INVALID) {
+                    MainActivity.selectListViewItemId = INVALID_LIST_VIEW_ITEM_ID;
+                    return;
+                }
+                if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_DEL) {
+                    MainActivity.this.showDeleteAlertDialog("删除记账！");
+                }else {
+                    Intent intent = new Intent(MainActivity.this, CreateActivity.class);
+                    startActivityForResult(intent, REQUEST);
+                }
+            }
+        });
+    }
+
+    private void resetPopListSelect() {
+        MainActivity.selectListViewItemId = INVALID_LIST_VIEW_ITEM_ID;
+        PopListViewAdapter.selectCmd = PopListViewAdapter.CMD_INVALID;
+    }
+
+    private void showDeleteAlertDialog(String title){
+        new AlertDialog.Builder(MainActivity.this)
+                .setTitle(title)
+                .setIcon(android.R.drawable.ic_delete)
+                .setMessage("确定吗")
+                .setPositiveButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Finance.deleteFromDb(MainActivity.this, MainActivity.selectListViewItemId);
+                        MainActivity.this.reflushListViewData();
+                        MainActivity.this.resetPopListSelect();
+                    }
+                })
+                .setNegativeButton("否", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        MainActivity.this.resetPopListSelect();
+                    }
+                })
+                .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialogInterface) {
+                        MainActivity.this.resetPopListSelect();
+                    }
+                })
+                .show();
+    }
+
+
+    /* handler */
+    private void initHandler() {
+        handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 0x001) {
+//                this.showFileListDialog("上传备份文件", backupFileNameStrArr, 2);
+//                adapter.add((String) msg.obj);
+                MainActivity.this.resetFileListSelect();
+                System.out.println(MainActivity.backupFileNameList.size());
+                String[] fileList = ((String) msg.obj).split(",");
+                String fileNameTag = "amount";
+                for(String it : fileList) {
+                    System.out.println(it);
+                    if(it.indexOf(fileNameTag) >= 0) {
+                        MainActivity.backupFileNameList.add(it);
+                        System.out.println("add " + it + MainActivity.backupFileNameList.size());
+                    }
+                }
+                String[] backupFileNameStrArr = new String[MainActivity.backupFileNameList.size()];
+                MainActivity.backupFileNameList.toArray(backupFileNameStrArr);
+                MainActivity.this.showFileListDialog("上传备份文件", backupFileNameStrArr, FILE_LIST_TYPE_REMOTEINPUT);
+                System.out.println((String) msg.obj);
+            } else if (msg.what == 0x002) {
+                Toast.makeText(MainActivity.this,
+                                "connect fail", Toast.LENGTH_SHORT)
+                        .show();
+            }
+        }
+    };
+    }
+
+
+
     public void btn_create(View view) {
         Button btn = (Button)view;
         int a = btn.getId();
@@ -330,25 +422,6 @@ public class MainActivity extends AppCompatActivity {
         }
         this.reflushListViewData();
 
-    }
-
-    // 解决listview 只能显示一条记录的问题
-    public static void setListViewHeightBasedOnChildren(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) {
-            return;
-        }
-
-        int totalHeight = 0;
-        for (int i = 0, len = listAdapter.getCount(); i < len; i++) { // listAdapter.getCount()返回数据项的数目
-            View listItem = listAdapter.getView(i, null, listView);
-            listItem.measure(0, 0); // 计算子项View 的宽高
-            totalHeight += listItem.getMeasuredHeight(); // 统计所有子项的总高度
-        }
-
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
     }
 
 }

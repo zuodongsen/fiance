@@ -134,6 +134,16 @@ public class Finance {
                 new Object[]{finance_.info, finance_.date, finance_.amount, finance_.type});
     }
 
+    public static void updateIdFromDb(Context context, Finance finance_) {
+        initDb(context);
+        for(String it : CreateActivity.amountType_old) {
+            for(String it_new: CreateActivity.amountType) {
+
+            }
+
+        }
+    }
+
     public static Finance getOneFormDb(Context context, int financeId_) {
         List<Finance> allFinances = new ArrayList<Finance>();
         initDb(context);
