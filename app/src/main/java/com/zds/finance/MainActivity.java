@@ -29,6 +29,11 @@ import java.util.Calendar;
 import java.util.List;
 
 //adb path C:\Users\dosens\AppData\Local\Android\Sdk\platform-tools
+/*
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+*/
+
 
 public class MainActivity extends AppCompatActivity {
     final static int REQUEST=10;
