@@ -28,6 +28,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
+//adb path C:\Users\dosens\AppData\Local\Android\Sdk\platform-tools
+
 public class MainActivity extends AppCompatActivity {
     final static int REQUEST=10;
 
