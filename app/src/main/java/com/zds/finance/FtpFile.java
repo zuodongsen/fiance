@@ -78,8 +78,10 @@ class FtpFile extends Thread {
     }
 
     private void upload() throws IOException {
+        HandlerMsgId.sendMsg(HandlerMsgId.FTP_FILE_UPLOAD_PROGRESS, "开始上传...");
         FileInputStream srcFileStream = new FileInputStream(this.localFilePath + this.localFileName);
         ftpClient.storeFile("/" + this.localFileName, srcFileStream);
+        HandlerMsgId.sendMsg(HandlerMsgId.FTP_FILE_UPLOAD_PROGRESS, "上传 " + this.localFileName + " 文件完成");
     }
 
     private String[] list() throws IOException {
@@ -87,8 +89,10 @@ class FtpFile extends Thread {
     }
 
     private void download() throws IOException {
+        HandlerMsgId.sendMsg(HandlerMsgId.FTP_FILE_DOWNLOAD_PROGRESS, "开始下载...");
         FileOutputStream fileOutputStream = new FileOutputStream(this.localFilePath + this.localFileName);
         ftpClient.retrieveFile("/" + this.localFileName, fileOutputStream);
+        HandlerMsgId.sendMsg(HandlerMsgId.FTP_FILE_DOWNLOAD_PROGRESS, "下载 " + this.localFileName + " 文件完成");
     }
 
     @Override
@@ -104,9 +108,7 @@ class FtpFile extends Thread {
                     msg += it;
                     msg += ",";
                 }
-                Message message = MainActivity.handler
-                        .obtainMessage(0x001, msg);
-                MainActivity.handler.sendMessage(message);
+                HandlerMsgId.sendMsg(HandlerMsgId.FTP_FILE_LIST_RSP, msg);
             }else if(this.type == FTP_TYPE_DOWNLOAD) {
                 this.download();
             }

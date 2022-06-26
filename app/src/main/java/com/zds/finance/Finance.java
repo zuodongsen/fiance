@@ -8,6 +8,9 @@ import android.view.View;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,6 +48,18 @@ public class Finance {
         this.type = type_;
     }
 
+    public Finance(String jsStr) {
+        try {
+            JSONObject js = new JSONObject(jsStr);
+            this.info = js.getString("info");
+            this.date = js.getLong("date");
+            this.amount = new Float(js.getDouble("amount"));
+            this.type = js.getInt("type");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     public String getInfo() {
         return this.info;
     }
@@ -70,7 +85,21 @@ public class Finance {
     }
 
     public String toString() {
-        return String.format("%d, %s, %d, %.2f", this.id, this.info, this.date, this.amount);
+        return String.format("%d, %s, %d, %.2f, %d", this.id, this.info, this.date, this.amount, this.type);
+    }
+
+    public String toJson() {
+        JSONObject js = new JSONObject();
+        try {
+            js.put("type", this.type);
+            js.put("amount", this.amount);
+            js.put("date", this.date);
+            js.put("info", this.info);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return js.toString();
     }
 
     public static String getDate2String(Date date_) {
@@ -132,6 +161,15 @@ public class Finance {
         initDb(context);
         db.execSQL("insert into finance(" + insertColName + ") values(?, ?, ?, ?)",
                 new Object[]{finance_.info, finance_.date, finance_.amount, finance_.type});
+    }
+
+    public static void inportToDb(List<String> data_) {
+        for (String it : data_) {
+
+            Finance finance = new Finance(it);
+            System.out.println("aaaaaa" + finance.toString());
+        }
+
     }
 
     public static void updateIdFromDb(Context context, Finance finance_) {

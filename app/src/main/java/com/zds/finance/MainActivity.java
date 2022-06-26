@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private ListView popListView;
     private TextView textMonth;
     private TextView textTotalAmount;
+    private TextView textLogInfo;
     private int selectYear;
     private int selectMonth;
     private float tatalAmount;
@@ -97,14 +98,15 @@ public class MainActivity extends AppCompatActivity {
             List<Finance> allFormDb = Finance.getAllFormDb(MainActivity.this);
             List<String> dataInfos = new ArrayList<>();
             for(Finance it : allFormDb) {
-                dataInfos.add(it.toString());
+                dataInfos.add(it.toJson());
             }
-            CSVWriteThread csvWriteThread = new CSVWriteThread(dataInfos, BACKUP_FILE_FOLDER, "amount_" + Finance.getNowDateTime2String() + ".csv");
+            FileRWThread csvWriteThread = new FileRWThread(dataInfos, BACKUP_FILE_FOLDER,
+                    "amount_" + Finance.getNowDateTime2String() + ".txt", FileRWThread.FILE_RW_TYPE_WRITE);
             csvWriteThread.run();
             return true;
         }else if(id == R.id.menu_remoteexport) {
-            FtpFile ftpFileUpload = new FtpFile("192.168.1.7", 21, "dosens", "123456");
-            ftpFileUpload.start();
+            FtpFile ftpFileDownload = new FtpFile("192.168.1.16", 21, "dosens", "123456");
+            ftpFileDownload.start();
         }else {
             File fileDir = new File(BACKUP_FILE_FOLDER);
             File[] files = fileDir.listFiles();
@@ -175,17 +177,22 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 if(MainActivity.selectFileIndexForInput != INVALID_FILE_SELECT_ID) {
                     System.out.println("now to input backup file: " + MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForInput));
+                    FileRWThread csvWriteThread = new FileRWThread(BACKUP_FILE_FOLDER,
+                            MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForInput),
+                            FileRWThread.FILE_RW_TYPE_READ);
+                    csvWriteThread.setFileReadCallBack(Finance::inportToDb);
+                    csvWriteThread.run();
                 }else if(!MainActivity.selectFileIndexForDelete.isEmpty()){
                     for(Integer it : MainActivity.selectFileIndexForDelete) {
-                        CSVWriteThread.deleteFile(BACKUP_FILE_FOLDER, MainActivity.backupFileNameList.get(it));
+                        FileRWThread.deleteFile(BACKUP_FILE_FOLDER, MainActivity.backupFileNameList.get(it));
                     }
                 }else if(MainActivity.selectFileIndexForUpload != INVALID_FILE_SELECT_ID) {
-                    FtpFile ftpFileUpload = new FtpFile("192.168.1.7", 21, "dosens", "123456",
+                    FtpFile ftpFileUpload = new FtpFile("192.168.1.16", 21, "dosens", "123456",
                             BACKUP_FILE_FOLDER + File.separator,
                             MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForUpload), FtpFile.FTP_TYPE_UPLOAD);
                     ftpFileUpload.start();
                 }else if(MainActivity.selectFileIndexForRemoteInput != INVALID_FILE_SELECT_ID) {
-                    FtpFile ftpFileUpload = new FtpFile("192.168.1.7", 21, "dosens", "123456",
+                    FtpFile ftpFileUpload = new FtpFile("192.168.1.16", 21, "dosens", "123456",
                             BACKUP_FILE_FOLDER + File.separator,
                             MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForRemoteInput), FtpFile.FTP_TYPE_DOWNLOAD);
                     ftpFileUpload.start();
@@ -223,6 +230,7 @@ public class MainActivity extends AppCompatActivity {
         this.selectMonth = calendar.get(Calendar.MONTH) + 1; // 得到当前月
         this.textMonth = (TextView) findViewById(R.id.text_month);
         this.textTotalAmount = (TextView) findViewById(R.id.text_total_amount);
+        this.textLogInfo = (TextView) findViewById(R.id.text_logInfo);
     }
 
     /* listview */
@@ -365,28 +373,33 @@ public class MainActivity extends AppCompatActivity {
         handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            if (msg.what == 0x001) {
-//                this.showFileListDialog("上传备份文件", backupFileNameStrArr, 2);
-//                adapter.add((String) msg.obj);
-                MainActivity.this.resetFileListSelect();
-                System.out.println(MainActivity.backupFileNameList.size());
-                String[] fileList = ((String) msg.obj).split(",");
-                String fileNameTag = "amount";
-                for(String it : fileList) {
-                    System.out.println(it);
-                    if(it.indexOf(fileNameTag) >= 0) {
-                        MainActivity.backupFileNameList.add(it);
-                        System.out.println("add " + it + MainActivity.backupFileNameList.size());
+            switch (msg.what){
+                case HandlerMsgId.FTP_FILE_LIST_RSP: {
+                    MainActivity.this.resetFileListSelect();
+                    System.out.println(MainActivity.backupFileNameList.size());
+                    String[] fileList = ((String) msg.obj).split(",");
+                    String fileNameTag = "amount";
+                    for(String it : fileList) {
+                        System.out.println(it);
+                        if(it.indexOf(fileNameTag) >= 0) {
+                            MainActivity.backupFileNameList.add(it);
+                            System.out.println("add " + it + MainActivity.backupFileNameList.size());
+                        }
                     }
+                    String[] backupFileNameStrArr = new String[MainActivity.backupFileNameList.size()];
+                    MainActivity.backupFileNameList.toArray(backupFileNameStrArr);
+                    MainActivity.this.showFileListDialog("上传备份文件", backupFileNameStrArr, FILE_LIST_TYPE_REMOTEINPUT);
+                    System.out.println((String) msg.obj);
+                    break;
                 }
-                String[] backupFileNameStrArr = new String[MainActivity.backupFileNameList.size()];
-                MainActivity.backupFileNameList.toArray(backupFileNameStrArr);
-                MainActivity.this.showFileListDialog("上传备份文件", backupFileNameStrArr, FILE_LIST_TYPE_REMOTEINPUT);
-                System.out.println((String) msg.obj);
-            } else if (msg.what == 0x002) {
-                Toast.makeText(MainActivity.this,
-                                "connect fail", Toast.LENGTH_SHORT)
-                        .show();
+                case HandlerMsgId.FTP_FILE_UPLOAD_PROGRESS:
+                case HandlerMsgId.FTP_FILE_DOWNLOAD_PROGRESS:
+                case HandlerMsgId.RW_FILE_READ_PROGRESS:
+                case HandlerMsgId.RW_FILE_WRITE_PROGRESS:
+                case HandlerMsgId.RW_FILE_DELETE_PROGRESS:
+                    MainActivity.this.textLogInfo.setText((String) msg.obj);
+                    break;
+
             }
         }
     };
