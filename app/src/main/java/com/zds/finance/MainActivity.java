@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         this.initListView();
         this.initPopListView();
         this.initHandler();
+        initStaticValue();
     }
 
     @Override
@@ -102,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.menu_export) {
-            List<Finance> allFormDb = Finance.getAllFormDb(MainActivity.this);
+            List<Finance> allFormDb = Finance.getAllFormDb();
             List<String> dataInfos = new ArrayList<>();
             for(Finance it : allFormDb) {
                 dataInfos.add(it.toJson());
@@ -199,10 +200,10 @@ public class MainActivity extends AppCompatActivity {
                             MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForUpload), FtpFile.FTP_TYPE_UPLOAD);
                     ftpFileUpload.start();
                 }else if(MainActivity.selectFileIndexForRemoteInput != INVALID_FILE_SELECT_ID) {
-                    FtpFile ftpFileUpload = new FtpFile("192.168.1.16", 21, "dosens", "123456",
+                    FtpFile ftpFileDownload = new FtpFile("192.168.1.16", 21, "dosens", "123456",
                             BACKUP_FILE_FOLDER + File.separator,
                             MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForRemoteInput), FtpFile.FTP_TYPE_DOWNLOAD);
-                    ftpFileUpload.start();
+                    ftpFileDownload.start();
                 }
                 MainActivity.this.resetFileListSelect();
             }
@@ -242,9 +243,15 @@ public class MainActivity extends AppCompatActivity {
 
     /* listview */
     private void initListView() {
+        Finance.initDb(MainActivity.this);
         this.resetPopListSelect();
         this.listView = (ListView)findViewById(R.id.list_view);
         this.reflushListViewData();
+    }
+
+    private void initStaticValue() {
+        resetPopListSelect();
+        resetFileListSelect();
     }
 
     private void genFinanceDateList() {
@@ -274,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void reflushListViewData() {
-        this.listData = Finance.getOneMonthFormDb(MainActivity.this, this.selectYear, this.selectMonth);
+        this.listData = Finance.getOneMonthFormDb(this.selectYear, this.selectMonth);
         this.genFinanceDateList();
         this.financeDateAdapter = new FinanceDateAdapter(this.financeAdapterList, MainActivity.this, R.layout.listview_date);
         this.listView.setAdapter(financeDateAdapter);
@@ -354,7 +361,7 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("是", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Finance.deleteFromDb(MainActivity.this, MainActivity.selectListViewItemId);
+                        Finance.deleteFromDb(MainActivity.selectListViewItemId);
                         MainActivity.this.reflushListViewData();
                         MainActivity.this.resetPopListSelect();
                     }
@@ -404,7 +411,7 @@ public class MainActivity extends AppCompatActivity {
                 case HandlerMsgId.RW_FILE_READ_PROGRESS:
                 case HandlerMsgId.RW_FILE_WRITE_PROGRESS:
                 case HandlerMsgId.RW_FILE_DELETE_PROGRESS:
-                    MainActivity.this.textLogInfo.setText((String) msg.obj);
+                    MainActivity.this.textLogInfo.setText("*******" + (String) msg.obj);
                     break;
 
             }

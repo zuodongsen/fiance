@@ -46,7 +46,7 @@ public class CreateActivity extends AppCompatActivity {
         this.day = calendar.get(Calendar.DAY_OF_MONTH); // 得到当前日
         initSpinnerType();
         if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_MODIFY) {
-            Finance finance = Finance.getOneFormDb(CreateActivity.this, MainActivity.selectListViewItemId);
+            Finance finance = Finance.getOneFormDb(MainActivity.selectListViewItemId);
             this.txtDate.setText(finance.getDate2String());
             this.txtInfo.setText(finance.info);
             this.txtAmount.setText(String.valueOf(finance.amount));
@@ -91,9 +91,9 @@ public class CreateActivity extends AppCompatActivity {
                 Float.parseFloat(this.txtAmount.getText().toString()),
                 this.spnType.getSelectedItemPosition());
         if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_MODIFY) {
-            Finance.updateToDb(CreateActivity.this, MainActivity.selectListViewItemId, finance);
+            Finance.updateToDb(MainActivity.selectListViewItemId, finance);
         }else {
-            Finance.insertToDb(CreateActivity.this, finance);
+            Finance.insertToDb(finance);
         }
         Intent data = new Intent();
         setResult(RESULT_OK, data);

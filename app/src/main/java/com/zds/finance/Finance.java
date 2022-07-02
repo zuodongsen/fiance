@@ -91,6 +91,7 @@ public class Finance {
     public String toJson() {
         JSONObject js = new JSONObject();
         try {
+            js.put("id", this.id);
             js.put("type", this.type);
             js.put("amount", this.amount);
             js.put("date", this.date);
@@ -98,7 +99,6 @@ public class Finance {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         return js.toString();
     }
 
@@ -141,39 +141,33 @@ public class Finance {
         return dateTmp.getTime();
     }
 
-    public static void clearDb(Context context) {
-        initDb(context);
+    public static void clearDb() {
         db.execSQL("delete from finance");
     }
 
-    public static void deleteFromDb(Context context, int financeId_) {
-        initDb(context);
+    public static void deleteFromDb(int financeId_) {
         db.execSQL("delete from finance where id = " + financeId_);
     }
 
-    public static void updateToDb(Context context, int financeId_, Finance finance_) {
-        initDb(context);
+    public static void updateToDb(int financeId_, Finance finance_) {
         db.execSQL("update finance set " + updateColName + " where id = " + financeId_,
                 new Object[]{finance_.info, finance_.date, finance_.amount, finance_.type});
     }
 
-    public static void insertToDb(Context context, Finance finance_) {
-        initDb(context);
+    public static void insertToDb(Finance finance_) {
         db.execSQL("insert into finance(" + insertColName + ") values(?, ?, ?, ?)",
                 new Object[]{finance_.info, finance_.date, finance_.amount, finance_.type});
     }
 
     public static void inportToDb(List<String> data_) {
+        clearDb();
         for (String it : data_) {
-
             Finance finance = new Finance(it);
-            System.out.println("aaaaaa" + finance.toString());
+            insertToDb(finance);
         }
-
     }
 
-    public static void updateIdFromDb(Context context, Finance finance_) {
-        initDb(context);
+    public static void updateIdFromDb(Finance finance_) {
         for(String it : CreateActivity.amountType_old) {
             for(String it_new: CreateActivity.amountType) {
 
@@ -182,9 +176,8 @@ public class Finance {
         }
     }
 
-    public static Finance getOneFormDb(Context context, int financeId_) {
+    public static Finance getOneFormDb(int financeId_) {
         List<Finance> allFinances = new ArrayList<Finance>();
-        initDb(context);
         Cursor cursor = db.rawQuery("select " + selectColName + " from finance where id = " + financeId_, null);
         if(cursor == null) {
             return null;
@@ -197,14 +190,12 @@ public class Finance {
         return allFinances.get(0);
     }
 
-    public static List<Finance> getOneMonthFormDb(Context context, int year, int month) {
-
+    public static List<Finance> getOneMonthFormDb(int year, int month) {
         String dataStartStr = String.format("%d年%02d月%02d日", year, month, 1);  //yyyy年MM月dd日
         String dataEndStr = String.format("%d年%02d月%02d日", year, month + 1, 1);  //yyyy年MM月dd日
         long dataStart = getString2Date(dataStartStr);
         long dataEnd = getString2Date(dataEndStr);
         List<Finance> allFinances = new ArrayList<Finance>();
-        initDb(context);
         Cursor cursor = db.rawQuery("select " + selectColName + " from finance where date >= " +
                             dataStart + " and date < " + dataEnd + " order by date", null);
         if(cursor == null) {
@@ -220,9 +211,8 @@ public class Finance {
     }
 
 
-    public static List<Finance> getAllFormDb(Context context) {
+    public static List<Finance> getAllFormDb() {
         List<Finance> allFinances = new ArrayList<Finance>();
-        initDb(context);
         Cursor cursor = db.rawQuery("select " + selectColName + " from finance order by date", null);
         if(cursor == null) {
             return allFinances;

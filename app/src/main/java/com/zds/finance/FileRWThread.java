@@ -135,7 +135,6 @@ public class FileRWThread extends Thread{
         }else if(this.typeRW == FILE_RW_TYPE_WRITE) {
             writeFile(this.data, this.folder, this.fileName);
         }
-
     }
 }
 
