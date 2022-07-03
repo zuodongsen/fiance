@@ -23,11 +23,6 @@ public class CreateActivity extends AppCompatActivity {
                                                             "居家", "养娃", "书籍", "电子",
                                                             "其他"};
 
-    public static final String[] amountType_old = new String[] {"买菜", "话费", "保险", "医疗",
-                                                                "交通", "养车", "服装", "长辈",
-                                                                "居家", "养娃", "书籍", "电子",
-                                                                "其他"};
-
     Calendar calendar = null;
     int year = 0; // 得到当前年
     int month = 0; // 得到当前月
@@ -84,11 +79,18 @@ public class CreateActivity extends AppCompatActivity {
     }
 
     public void btn_save(View view) {
-        System.out.println(this.spnType.getSelectedItemPosition());
+        float amount_ = 0;
+        try {
+            amount_ = Float.parseFloat(this.txtAmount.getText().toString());
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            this.txtAmount.setTextColor(getResources().getColor(R.color.red));
+            return;
+        }
         Finance finance = new Finance(
                 this.txtInfo.getText().toString(),
                 this.txtDate.getText().toString(),
-                Float.parseFloat(this.txtAmount.getText().toString()),
+                amount_,
                 this.spnType.getSelectedItemPosition());
         if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_MODIFY) {
             Finance.updateToDb(MainActivity.selectListViewItemId, finance);

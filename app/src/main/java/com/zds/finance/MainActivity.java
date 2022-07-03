@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         this.initMenuBar();
         this.initSelectYearMonth();
+        this.initTextView();
         this.initListView();
         this.initPopListView();
         this.initHandler();
@@ -236,6 +237,9 @@ public class MainActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         this.selectYear = calendar.get(Calendar.YEAR); // 得到当前年
         this.selectMonth = calendar.get(Calendar.MONTH) + 1; // 得到当前月
+    }
+
+    private void initTextView() {
         this.textMonth = (TextView) findViewById(R.id.text_month);
         this.textTotalAmount = (TextView) findViewById(R.id.text_total_amount);
         this.textLogInfo = (TextView) findViewById(R.id.text_logInfo);
@@ -439,13 +443,15 @@ public class MainActivity extends AppCompatActivity {
             }else {
                 this.selectMonth --;
             }
-        }else {
+        }else if(btn.getId() == R.id.bt_right) {
             if(this.selectMonth == 12) {
                 this.selectMonth = 1;
                 this.selectYear ++;
             }else {
                 this.selectMonth ++;
             }
+        }else {
+            this.initSelectYearMonth();
         }
         this.reflushListViewData();
 

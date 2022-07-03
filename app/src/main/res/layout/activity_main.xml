@@ -32,10 +32,13 @@
             android:id="@+id/bt_left"
             android:layout_width="50dp"
             android:layout_height="30dp"
+            android:layout_marginTop="4dp"
             android:layout_toLeftOf="@id/text_month"
             android:background="@android:color/transparent"
+            android:includeFontPadding="false"
             android:onClick="btn_dateChange"
-            android:text="@string/left" />
+            android:text="@string/left"
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/text_month"
@@ -43,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="8dp"
             android:text="month"
             android:textSize="20sp" />
 
@@ -51,10 +54,14 @@
             android:id="@+id/bt_right"
             android:layout_width="50dp"
             android:layout_height="30dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
             android:layout_toRightOf="@id/text_month"
             android:background="@android:color/transparent"
+            android:includeFontPadding="false"
             android:onClick="btn_dateChange"
-            android:text="@string/right" />
+            android:text="@string/right"
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/text_total_amount"
@@ -62,7 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_alignTop="@id/bt_create"
             android:layout_marginStart="30dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="8dp"
             android:layout_toRightOf="@id/bt_right"
             android:text="total_a"
             android:textSize="22sp" />
@@ -73,10 +80,25 @@
             android:layout_height="35dp"
             android:background="@android:color/transparent"
             android:backgroundTint="@null"
+            android:includeFontPadding="false"
             android:onClick="btn_create"
             android:paddingTop="0dp"
             android:text="+"
-            android:textSize="24sp" />
+            android:textSize="32sp"
+            tools:fontFamily="sans-serif-light" />
+
+        <Button
+            android:id="@+id/bt_showCurMonth"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="2dp"
+            android:layout_toLeftOf="@id/bt_left"
+            android:background="@android:color/transparent"
+            android:fontFamily="serif-monospace"
+            android:includeFontPadding="false"
+            android:onClick="btn_dateChange"
+            android:text="O"
+            android:textSize="34sp" />
 
     </RelativeLayout>
 

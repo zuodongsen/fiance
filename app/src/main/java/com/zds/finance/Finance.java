@@ -167,14 +167,14 @@ public class Finance {
         }
     }
 
-    public static void updateIdFromDb(Finance finance_) {
-        for(String it : CreateActivity.amountType_old) {
-            for(String it_new: CreateActivity.amountType) {
-
-            }
-
-        }
-    }
+//    public static void updateIdFromDb(Finance finance_) {
+//        for(String it : CreateActivity.amountType_old) {
+//            for(String it_new: CreateActivity.amountType) {
+//
+//            }
+//
+//        }
+//    }
 
     public static Finance getOneFormDb(int financeId_) {
         List<Finance> allFinances = new ArrayList<Finance>();
