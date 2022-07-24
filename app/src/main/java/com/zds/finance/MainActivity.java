@@ -114,8 +114,8 @@ public class MainActivity extends AppCompatActivity {
             csvWriteThread.run();
             return true;
         }else if(id == R.id.menu_remoteexport) {
-            FtpFile ftpFileDownload = new FtpFile("192.168.1.16", 21, "dosens", "123456");
-            ftpFileDownload.start();
+            FtpFile ftpList = new FtpFile();
+            ftpList.doTypeList();
         }else {
             File fileDir = new File(BACKUP_FILE_FOLDER);
             File[] files = fileDir.listFiles();
@@ -185,7 +185,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 if(MainActivity.selectFileIndexForInput != INVALID_FILE_SELECT_ID) {
-                    System.out.println("now to input backup file: " + MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForInput));
                     FileRWThread csvWriteThread = new FileRWThread(BACKUP_FILE_FOLDER,
                             MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForInput),
                             FileRWThread.FILE_RW_TYPE_READ);
@@ -196,15 +195,15 @@ public class MainActivity extends AppCompatActivity {
                         FileRWThread.deleteFile(BACKUP_FILE_FOLDER, MainActivity.backupFileNameList.get(it));
                     }
                 }else if(MainActivity.selectFileIndexForUpload != INVALID_FILE_SELECT_ID) {
-                    FtpFile ftpFileUpload = new FtpFile("192.168.1.16", 21, "dosens", "123456",
-                            BACKUP_FILE_FOLDER + File.separator,
-                            MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForUpload), FtpFile.FTP_TYPE_UPLOAD);
-                    ftpFileUpload.start();
+                    FtpFile ftpUpload = new FtpFile();
+                    ftpUpload.doTypeDownOrUpload(BACKUP_FILE_FOLDER + File.separator,
+                            MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForUpload),
+                            FtpFile.FTP_TYPE_UPLOAD);
                 }else if(MainActivity.selectFileIndexForRemoteInput != INVALID_FILE_SELECT_ID) {
-                    FtpFile ftpFileDownload = new FtpFile("192.168.1.16", 21, "dosens", "123456",
-                            BACKUP_FILE_FOLDER + File.separator,
-                            MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForRemoteInput), FtpFile.FTP_TYPE_DOWNLOAD);
-                    ftpFileDownload.start();
+                    FtpFile ftpFileDownload = new FtpFile();
+                    ftpFileDownload.doTypeDownOrUpload(BACKUP_FILE_FOLDER + File.separator,
+                            MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForRemoteInput),
+                            FtpFile.FTP_TYPE_DOWNLOAD);
                 }
                 MainActivity.this.resetFileListSelect();
             }
@@ -406,7 +405,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     String[] backupFileNameStrArr = new String[MainActivity.backupFileNameList.size()];
                     MainActivity.backupFileNameList.toArray(backupFileNameStrArr);
-                    MainActivity.this.showFileListDialog("上传备份文件", backupFileNameStrArr, FILE_LIST_TYPE_REMOTEINPUT);
+                    MainActivity.this.showFileListDialog("下载备份文件", backupFileNameStrArr, FILE_LIST_TYPE_REMOTEINPUT);
                     System.out.println((String) msg.obj);
                     break;
                 }

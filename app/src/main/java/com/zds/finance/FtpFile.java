@@ -14,10 +14,10 @@ import java.net.SocketException;
 
 class FtpFile extends Thread {
     private FTPClient ftpClient = null;
-    private String hostIp;
-    private int port;
-    private String usrName;
-    private String password;
+    private final String hostIp = "192.168.1.16";
+    private final int port = 21;
+    private final String usrName = "dosens";
+    private final String password = "123456";
     private String localFilePath;
     private String localFileName;
     private String remoteFileName;
@@ -26,23 +26,7 @@ class FtpFile extends Thread {
     public static final int FTP_TYPE_LIST = 1;
     public static final int FTP_TYPE_DOWNLOAD = 2;
 
-    public FtpFile(String hostIp_, int port_, String usrName_, String password_, String localFilePath_, String fileName_, int type_) {
-        this.hostIp = hostIp_;
-        this.port = port_;
-        this.usrName = usrName_;
-        this.password = password_;
-        this.localFilePath = localFilePath_;
-        this.localFileName = fileName_;
-        this.remoteFileName = fileName_;
-        this.type = type_;
-    }
-
-    public FtpFile(String hostIp_, int port_, String usrName_, String password_) {
-        this.hostIp = hostIp_;
-        this.port = port_;
-        this.usrName = usrName_;
-        this.password = password_;
-    }
+    public FtpFile() { }
 
     public void doTypeList() {
         this.type = FTP_TYPE_LIST;
@@ -53,6 +37,7 @@ class FtpFile extends Thread {
         this.type = type_;
         this.localFilePath = localFilePath_;
         this.localFileName = fileName_;
+        this.remoteFileName = fileName_;
         this.start();
     }
     private boolean isFtpClientReplyOk() throws IOException {

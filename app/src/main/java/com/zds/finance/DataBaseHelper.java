@@ -12,10 +12,14 @@ import java.util.List;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
     List<String> createTableCmdList = new ArrayList<>();
-
     public DataBaseHelper(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
         createTableCmdList.add("create table finance (id integer primary key, name varchar(200), date integer, amount float(10, 8), type integer)");
+        createTableCmdList.add("create table ftpinfo (id integer primary key, name varchar(200), usr varchar(200), passwd varchar(200))");
+        createTableCmdList.add("create table amounttype (id integer primary key, name varchar(200))");
+        for (String type: CreateActivity.amountType ) {
+            createTableCmdList.add("insert into amounttype(name) value(" + type + ")");
+        }
     }
 
     @Override
