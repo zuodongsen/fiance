@@ -42,9 +42,19 @@ class FtpFile extends Thread {
         this.port = port_;
         this.usrName = usrName_;
         this.password = password_;
-        this.type = FTP_TYPE_LIST;
     }
 
+    public void doTypeList() {
+        this.type = FTP_TYPE_LIST;
+        this.start();
+    }
+
+    public void doTypeDownOrUpload(String localFilePath_, String fileName_, int type_) {
+        this.type = type_;
+        this.localFilePath = localFilePath_;
+        this.localFileName = fileName_;
+        this.start();
+    }
     private boolean isFtpClientReplyOk() throws IOException {
         int reply = ftpClient.getReply();
         if(!FTPReply.isNegativePermanent(reply)) {

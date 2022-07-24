@@ -1,5 +1,7 @@
 package com.zds.finance;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.Spinner;
 import android.widget.TextView;
+import java.util.Date;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -36,20 +39,19 @@ public class CreateActivity extends AppCompatActivity {
         this.txtInfo = (TextView)findViewById(R.id.textedit_info);
         this.txtAmount = (TextView)findViewById(R.id.textedit_amount);
         this.calendar = Calendar.getInstance();
-        this.year = calendar.get(Calendar.YEAR); // 得到当前年
-        this.month = calendar.get(Calendar.MONTH) + 1; // 得到当前月
-        this.day = calendar.get(Calendar.DAY_OF_MONTH); // 得到当前日
         initSpinnerType();
         if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_MODIFY) {
             Finance finance = Finance.getOneFormDb(MainActivity.selectListViewItemId);
             this.txtDate.setText(finance.getDate2String());
             this.txtInfo.setText(finance.info);
             this.txtAmount.setText(String.valueOf(finance.amount));
-            System.out.println("finance.type" + finance.type);
             this.spnType.setSelection(finance.type);
-        }else {
-            this.txtDate.setText(String.format("%d年%02d月%02d日", year, month, day));
+            this.calendar.setTime(Finance.getDate(finance.date));
         }
+        this.year = calendar.get(Calendar.YEAR); // 得到当前年
+        this.month = calendar.get(Calendar.MONTH) + 1; // 得到当前月
+        this.day = calendar.get(Calendar.DAY_OF_MONTH); // 得到当前日
+        this.txtDate.setText(String.format("%d年%02d月%02d日", year, month, day));
     }
 
     private void initSpinnerType() {
@@ -63,18 +65,16 @@ public class CreateActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    @SuppressLint("ResourceType")
     public void btn_select_date(View view) {
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR); // 得到当前年
-        int month = calendar.get(Calendar.MONTH); // 得到当前月
-        int day = calendar.get(Calendar.DAY_OF_MONTH); // 得到当前日
-        new DatePickerDialog(CreateActivity.this, new DatePickerDialog.OnDateSetListener() {
+        new DatePickerDialog(CreateActivity.this, 3, new DatePickerDialog.OnDateSetListener() {
             @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                txtDate.setText(String.format("%d年%02d月%02d日", year, month + 1, dayOfMonth));
+            public void onDateSet(DatePicker view, int year_, int month_, int dayOfMonth) {
+                txtDate.setText(String.format("%d年%02d月%02d日", year_, month_ + 1, dayOfMonth));
+                year = year_; month = month_ + 1; day = dayOfMonth;
             }
 
-        },year,month,day).show();
+        }, this.year, this.month - 1, this.day).show();
 
     }
 

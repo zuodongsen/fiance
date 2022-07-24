@@ -112,9 +112,14 @@ public class Finance {
         return formatter.format(date_);
     }
 
-    public static String getDate2String(long date_) {
+    public static Date getDate(long date_) {
         Date dateTmp = new Date();
         dateTmp.setTime(date_);
+        return dateTmp;
+    }
+
+    public static String getDate2String(long date_) {
+        Date dateTmp = getDate(date_);
         return getDate2String(dateTmp);
     }
 
