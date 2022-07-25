@@ -1,7 +1,6 @@
 package com.zds.finance;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,7 +9,6 @@ import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.Spinner;
 import android.widget.TextView;
-import java.util.Date;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -41,7 +39,7 @@ public class CreateActivity extends AppCompatActivity {
         this.calendar = Calendar.getInstance();
         initSpinnerType();
         if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_MODIFY) {
-            Finance finance = Finance.getOneFormDb(MainActivity.selectListViewItemId);
+            Finance finance = Finance.getOneFormDb(MainActivity.selectListViewFinanceId);
             this.txtDate.setText(finance.getDate2String());
             this.txtInfo.setText(finance.info);
             this.txtAmount.setText(String.valueOf(finance.amount));
@@ -93,7 +91,7 @@ public class CreateActivity extends AppCompatActivity {
                 amount_,
                 this.spnType.getSelectedItemPosition());
         if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_MODIFY) {
-            Finance.updateToDb(MainActivity.selectListViewItemId, finance);
+            Finance.updateToDb(MainActivity.selectListViewFinanceId, finance);
         }else {
             Finance.insertToDb(finance);
         }

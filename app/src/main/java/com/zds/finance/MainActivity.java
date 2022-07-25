@@ -18,7 +18,6 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.zds.finance.databinding.ActivityMainBinding;
 
@@ -54,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
     final static List<String> popListData = Arrays.asList("删除", "修改");
     static PopupWindow popWin;
-    static int selectListViewItemId;
+    static int selectListViewFinanceId;
     static int selectFileIndexForInput;
     static int selectFileIndexForUpload;
     static int selectFileIndexForRemoteInput;
@@ -326,19 +325,19 @@ public class MainActivity extends AppCompatActivity {
         this.popListView.setBackgroundResource(R.drawable.textview_border);
 
         popWin = new PopupWindow(MainActivity.this);
-        popWin.setWidth(200);//设置宽度 和编辑框的宽度相同
-        popWin.setHeight(200);
+        popWin.setWidth(400);//设置宽度 和编辑框的宽度相同
+        popWin.setHeight(180);
         popWin.setContentView(popListView);
         popWin.setOutsideTouchable(true);
 
         popWin.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
-                if(MainActivity.selectListViewItemId == INVALID_LIST_VIEW_ITEM_ID){
+                if(MainActivity.selectListViewFinanceId == INVALID_LIST_VIEW_ITEM_ID){
                     return;
                 }
                 if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_INVALID) {
-                    MainActivity.selectListViewItemId = INVALID_LIST_VIEW_ITEM_ID;
+                    MainActivity.selectListViewFinanceId = INVALID_LIST_VIEW_ITEM_ID;
                     return;
                 }
                 if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_DEL) {
@@ -352,7 +351,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void resetPopListSelect() {
-        MainActivity.selectListViewItemId = INVALID_LIST_VIEW_ITEM_ID;
+        MainActivity.selectListViewFinanceId = INVALID_LIST_VIEW_ITEM_ID;
         PopListViewAdapter.selectCmd = PopListViewAdapter.CMD_INVALID;
     }
 
@@ -364,7 +363,7 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("是", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Finance.deleteFromDb(MainActivity.selectListViewItemId);
+                        Finance.deleteFromDb(MainActivity.selectListViewFinanceId);
                         MainActivity.this.reflushListViewData();
                         MainActivity.this.resetPopListSelect();
                     }
