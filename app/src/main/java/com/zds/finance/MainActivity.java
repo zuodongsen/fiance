@@ -287,10 +287,6 @@ public class MainActivity extends AppCompatActivity {
         this.reflushListViewData();
     }
 
-
-
-
-
     private void initStaticValue() {
         resetPopListSelect();
         resetFileListSelect();
@@ -365,7 +361,7 @@ public class MainActivity extends AppCompatActivity {
         this.popListView.setBackgroundResource(R.drawable.textview_border);
 
         popWin = new PopupWindow(MainActivity.this);
-        popWin.setWidth(400);//设置宽度 和编辑框的宽度相同
+        popWin.setWidth(300);//设置宽度 和编辑框的宽度相同
         popWin.setHeight(180);
         popWin.setContentView(popListView);
         popWin.setOutsideTouchable(true);

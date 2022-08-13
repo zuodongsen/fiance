@@ -6,9 +6,10 @@
 
     <TextView
         android:id="@+id/textView_pop"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="TextView"
+        android:gravity="center"
         android:textSize="20sp" />
 </LinearLayout>
