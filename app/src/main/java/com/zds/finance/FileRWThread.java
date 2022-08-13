@@ -51,15 +51,6 @@ public class FileRWThread extends Thread{
         this.fileReadCallBack = fileReadCallBack_;
     }
 
-    private void createFolder() {
-        File fileDir = new File(folder);
-        boolean hasDir = fileDir.exists();
-        if (!hasDir) {
-            System.out.println("create dirc: " + folder);
-            fileDir.mkdirs();// 这里创建的是目录
-        }
-    }
-
     public static void deleteFile(String folder_, String fileName_) {
         File file = new File(folder_ + File.separator + fileName_);
         if (file.exists()) {
@@ -126,7 +117,6 @@ public class FileRWThread extends Thread{
 
     public void run() {
         super.run();
-        createFolder();
         if(this.typeRW == FILE_RW_TYPE_READ) {
             readFile(this.data, this.folder, this.fileName);
             if(this.fileReadCallBack != null) {

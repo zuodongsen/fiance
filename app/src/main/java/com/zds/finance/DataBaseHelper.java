@@ -1,6 +1,7 @@
 package com.zds.finance;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -14,12 +15,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     List<String> createTableCmdList = new ArrayList<>();
     public DataBaseHelper(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
-        createTableCmdList.add("create table finance (id integer primary key, name varchar(200), date integer, amount float(10, 8), type integer)");
-        createTableCmdList.add("create table ftpinfo (id integer primary key, name varchar(200), usr varchar(200), passwd varchar(200))");
-        createTableCmdList.add("create table amounttype (id integer primary key, name varchar(200))");
-        for (String type: CreateActivity.amountType ) {
-            createTableCmdList.add("insert into amounttype(name) value(" + type + ")");
-        }
+        createTableCmdList.add("create table if not exists finance (id integer primary key, type varchar(200), name varchar(200), date integer, amount float(10, 8))");
+        createTableCmdList.add("create table if not exists ftpinfo (id integer primary key, name varchar(200), usr varchar(200), passwd varchar(200))");
     }
 
     @Override
@@ -33,7 +30,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int i, int i1) {
+    public void onUpgrade(SQLiteDatabase db, int oldVer, int newVer) {
 
     }
 

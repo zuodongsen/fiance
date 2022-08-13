@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -27,7 +28,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-//adb path C:\Users\dosens\AppData\Local\Android\Sdk\platform-tools
+    //adb path C:\Users\dosens\AppData\Local\Android\Sdk\platform-tools
 /*
 git config --global --unset http.proxy
 git config --global --unset https.proxy
@@ -77,7 +78,8 @@ public class MainActivity extends AppCompatActivity {
         this.initListView();
         this.initPopListView();
         this.initHandler();
-        initStaticValue();
+        this.initStaticValue();
+        this.initFileDirc();
     }
 
     @Override
@@ -136,13 +138,47 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private float touchDownX = 0f;
+    private float touchUpX = 0f;
+    private final int TOUCH_MOVE_MIN_X = 100;
+    @Override
+    public  boolean onTouchEvent(MotionEvent motionEvent) {
+        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+            touchDownX = motionEvent.getX();
+            return super.onTouchEvent(motionEvent);
+        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+            touchUpX = motionEvent.getX();
+            if (touchUpX - touchDownX > TOUCH_MOVE_MIN_X) {
+                modifyListViewShowMonth(-1);
+                reflushListViewData();
+            } else if (touchDownX - touchUpX > TOUCH_MOVE_MIN_X) {
+                modifyListViewShowMonth(1);
+                reflushListViewData();
+            }
+        }
+        return super.onTouchEvent(motionEvent);
+    }
+
     private void initMenuBar() {
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbarMenu);
+        this.resetFileListSelect();
+    }
+
+    private void initFileDirc() {
         FILE_FOLDER = this.getFilesDir().toString() + File.separator;
         BACKUP_FILE_FOLDER = FILE_FOLDER + BACKUP_PATH;
-        this.resetFileListSelect();
+        this.createFolder(BACKUP_FILE_FOLDER);
+    }
+
+    private void createFolder(String folder) {
+        File fileDir = new File(folder);
+        boolean hasDir = fileDir.exists();
+        if (!hasDir) {
+            System.out.println("create dirc: " + folder);
+            fileDir.mkdirs();// 这里创建的是目录
+        }
     }
 
     private void showFileListDialog(String title, String[] fileList, int mode/* 0 select, 1 delete, 2 upload, 3 remote input*/){
@@ -247,9 +283,13 @@ public class MainActivity extends AppCompatActivity {
     private void initListView() {
         Finance.initDb(MainActivity.this);
         this.resetPopListSelect();
-        this.listView = (ListView)findViewById(R.id.list_view);
+        this.listView = (ListView) findViewById(R.id.list_view);
         this.reflushListViewData();
     }
+
+
+
+
 
     private void initStaticValue() {
         resetPopListSelect();
@@ -384,6 +424,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
     /* handler */
     private void initHandler() {
         handler = new Handler() {
@@ -431,28 +472,27 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void modifyListViewShowMonth(int monthAdd) {
+        this.selectMonth += monthAdd;
+        while(this.selectMonth <= 0) {
+            this.selectMonth += 12;
+            this.selectYear --;
+        }
+        this.selectYear += (this.selectMonth / 12);
+        this.selectMonth = (this.selectMonth % 12);
+    }
+
     public void btn_dateChange(View view) {
         TextView btn = (TextView)view;
         int a = btn.getId();
         if(btn.getId() == R.id.bt_left) {
-            if(this.selectMonth == 1) {
-                this.selectMonth = 12;
-                this.selectYear --;
-            }else {
-                this.selectMonth --;
-            }
+            modifyListViewShowMonth(-1);
         }else if(btn.getId() == R.id.bt_right) {
-            if(this.selectMonth == 12) {
-                this.selectMonth = 1;
-                this.selectYear ++;
-            }else {
-                this.selectMonth ++;
-            }
+            modifyListViewShowMonth(1);
         }else {
             this.initSelectYearMonth();
         }
         this.reflushListViewData();
-
     }
 
 }

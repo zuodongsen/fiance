@@ -19,10 +19,11 @@ public class CreateActivity extends AppCompatActivity {
     private TextView txtInfo;
     private TextView txtAmount;
     private Spinner spnType;
-    public static final String[] amountType = new String[] {"买菜", "话费", "保险", "医疗",
-                                                            "交通", "养车", "服装", "长辈",
-                                                            "居家", "养娃", "书籍", "电子",
-                                                            "其他"};
+    public static final String[] amountType = new String[] {
+            "买菜", "水果", "话费", "水费", "电费",
+            "保险", "交通", "养车", "服装", "长辈",
+            "居家", "养娃", "书籍", "电子", "理财",
+            "餐饮", "购物", "旅游", "医疗", "其他"};
 
     Calendar calendar = null;
     int year = 0; // 得到当前年
@@ -43,7 +44,7 @@ public class CreateActivity extends AppCompatActivity {
             this.txtDate.setText(finance.getDate2String());
             this.txtInfo.setText(finance.info);
             this.txtAmount.setText(String.valueOf(finance.amount));
-            this.spnType.setSelection(finance.type);
+            this.spnType.setSelection(getTypeIdByName(finance.type));
             this.calendar.setTime(Finance.getDate(finance.date));
         }
         this.year = calendar.get(Calendar.YEAR); // 得到当前年
@@ -54,8 +55,19 @@ public class CreateActivity extends AppCompatActivity {
 
     private void initSpinnerType() {
         this.spnType = (Spinner)findViewById(R.id.spn_type);
-        ArrayAdapter<String> typeAdapter = new ArrayAdapter<String>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, amountType);
+        ArrayAdapter<String> typeAdapter = new ArrayAdapter<String>(this, R.layout.spinner_list_layout, R.id.list_textviewid, amountType);
         this.spnType.setAdapter(typeAdapter);
+    }
+
+    private int getTypeIdByName(String typeName) {
+        int rst = 0;
+        for(String it : CreateActivity.amountType) {
+            if(it.equals(typeName)){
+                return rst;
+            }
+            rst ++;
+        }
+        return rst;
     }
 
     @Override
@@ -89,7 +101,7 @@ public class CreateActivity extends AppCompatActivity {
                 this.txtInfo.getText().toString(),
                 this.txtDate.getText().toString(),
                 amount_,
-                this.spnType.getSelectedItemPosition());
+                this.spnType.getSelectedItem().toString());
         if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_MODIFY) {
             Finance.updateToDb(MainActivity.selectListViewFinanceId, finance);
         }else {

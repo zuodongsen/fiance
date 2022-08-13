@@ -23,7 +23,7 @@ public class Finance {
         this.date = 0;
         this.id = 0;
         this.amount = 0;
-        this.type = 0;
+        this.type = "";
     }
 
     public Finance(String name_, Date date_, float amount_) {
@@ -32,7 +32,7 @@ public class Finance {
         this.amount = amount_;
     }
 
-    public Finance(String name_, String date_, float amount_, int type_) {
+    public Finance(String name_, String date_, float amount_, String type_) {
         this.info = name_;
         this.date = getString2Date(date_);
         this.id = 0;
@@ -40,7 +40,7 @@ public class Finance {
         this.type = type_;
     }
 
-    public Finance(int id_, String name_, long date_, float amount_, int type_) {
+    public Finance(int id_, String name_, long date_, float amount_, String type_) {
         this.id = id_;
         this.info = name_;
         this.date = date_;
@@ -54,7 +54,7 @@ public class Finance {
             this.info = js.getString("info");
             this.date = js.getLong("date");
             this.amount = new Float(js.getDouble("amount"));
-            this.type = js.getInt("type");
+            this.type = js.getString("type");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -68,7 +68,7 @@ public class Finance {
         txtVeiwName_.setText(this.info);
         txtViewId_.setText(String.valueOf(this.id));
         txtAmound_.setText(String.valueOf(this.amount));
-        txtType_.setText(CreateActivity.amountType[this.type]);
+        txtType_.setText(this.type);
     }
 
     public void setHolder(TextView txtVeiwName_, TextView txtViewId_, TextView txtAmound_, TextView txtType_, TextView txtDate_) {
@@ -76,7 +76,7 @@ public class Finance {
         txtViewId_.setText(String.valueOf(this.id));
         txtAmound_.setText(String.valueOf(this.amount));
         txtDate_.setVisibility(View.VISIBLE);
-        txtType_.setText(CreateActivity.amountType[this.type]);
+        txtType_.setText(this.type);
         txtDate_.setText(this.getDate2String());
     }
 
@@ -85,7 +85,7 @@ public class Finance {
     }
 
     public String toString() {
-        return String.format("%d, %s, %d, %.2f, %d", this.id, this.info, this.date, this.amount, this.type);
+        return String.format("%d, %s, %d, %.2f, %s", this.id, this.info, this.date, this.amount, this.type);
     }
 
     public String toJson() {
@@ -189,7 +189,7 @@ public class Finance {
         }
         while(cursor.moveToNext()) {
             Finance finance = new Finance(cursor.getInt(0), cursor.getString(1),
-                    cursor.getLong(2), cursor.getFloat(3), cursor.getInt(4));
+                    cursor.getLong(2), cursor.getFloat(3), cursor.getString(4));
             allFinances.add(finance);
         }
         return allFinances.get(0);
@@ -208,7 +208,7 @@ public class Finance {
         }
         while(cursor.moveToNext()) {
             Finance finance = new Finance(cursor.getInt(0), cursor.getString(1),
-                    cursor.getLong(2), cursor.getFloat(3), cursor.getInt(4));
+                    cursor.getLong(2), cursor.getFloat(3), cursor.getString(4));
             allFinances.add(finance);
         }
 
@@ -224,7 +224,7 @@ public class Finance {
         }
         while(cursor.moveToNext()) {
             Finance finance = new Finance(cursor.getInt(0), cursor.getString(1),
-                    cursor.getLong(2), cursor.getFloat(3), cursor.getInt(4));
+                    cursor.getLong(2), cursor.getFloat(3), cursor.getString(4));
             allFinances.add(finance);
         }
 
@@ -243,7 +243,7 @@ public class Finance {
     public String info;
     public long date;
     public float amount;
-    public int type;
+    public String type;
     public int id;
     private static DataBaseHelper dbHelper = null;
     private static SQLiteDatabase db = null;
