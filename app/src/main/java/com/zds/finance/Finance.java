@@ -172,15 +172,6 @@ public class Finance {
         }
     }
 
-//    public static void updateIdFromDb(Finance finance_) {
-//        for(String it : CreateActivity.amountType_old) {
-//            for(String it_new: CreateActivity.amountType) {
-//
-//            }
-//
-//        }
-//    }
-
     public static Finance getOneFormDb(int financeId_) {
         List<Finance> allFinances = new ArrayList<Finance>();
         Cursor cursor = db.rawQuery("select " + selectColName + " from finance where id = " + financeId_, null);

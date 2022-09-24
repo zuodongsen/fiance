@@ -11,10 +11,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.SocketException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class FtpFile extends Thread {
     private FTPClient ftpClient = null;
-    private final String hostIp = "192.168.1.16";
+    private static String hostIp = "192.168.1.10";
     private final int port = 21;
     private final String usrName = "dosens";
     private final String password = "123456";
@@ -28,6 +30,23 @@ class FtpFile extends Thread {
 
     public FtpFile() { }
 
+    public static String getHostIp() {
+        return FtpFile.hostIp;
+    }
+
+    public static void setHostIp(String hostIp_) {
+        String regex = "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}";
+        String msgInfo = "设置ftp服务器地址：" + hostIp_ + " ";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(hostIp_);
+        if(matcher.matches()) {
+            HandlerMsgId.sendMsg(HandlerMsgId.FTP_FILE_SET_HOST_IP_SUCCESS, msgInfo + "成功");
+            FtpFile.hostIp = hostIp_;
+        }else {
+            HandlerMsgId.sendMsg(HandlerMsgId.FTP_FILE_SET_HOST_IP_FAIL, msgInfo + "失败");
+        }
+    }
+
     public void doTypeList() {
         this.type = FTP_TYPE_LIST;
         this.start();
@@ -39,13 +58,6 @@ class FtpFile extends Thread {
         this.localFileName = fileName_;
         this.remoteFileName = fileName_;
         this.start();
-    }
-    private boolean isFtpClientReplyOk() throws IOException {
-        int reply = ftpClient.getReply();
-        if(!FTPReply.isNegativePermanent(reply)) {
-            return false;
-        }
-        return true;
     }
 
     private void connnectFtp() throws IOException, SocketException {
@@ -94,6 +106,12 @@ class FtpFile extends Thread {
     public void run() {
         try {
             this.connnectFtp();
+        } catch (Exception e) {
+            HandlerMsgId.sendMsg(HandlerMsgId.FTP_FILE_CONNECT_FAIL, "连接 " + hostIp + " 失败");
+            return;
+        }
+
+        try {
             if(this.type == FTP_TYPE_UPLOAD) {
                 this.upload();
             }else if(this.type == FTP_TYPE_LIST){

@@ -21,7 +21,9 @@
     <string name="deletebackup">"删除备份"</string>
     <string name="uploadbackup">"上传备份"</string>
     <string name="remoteexport">"远程导入"</string>
+    <string name="setftp">"ftp设置"</string>
     <string name="loginfo">"日志: "</string>
+    <string name="ftpserverip">"服务器地址: "</string>
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 </resources>

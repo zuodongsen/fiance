@@ -3,18 +3,22 @@ package com.zds.finance;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Handler;
 import android.os.Message;
+import android.text.InputFilter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -117,7 +121,23 @@ public class MainActivity extends AppCompatActivity {
         }else if(id == R.id.menu_remoteexport) {
             FtpFile ftpList = new FtpFile();
             ftpList.doTypeList();
-        }else {
+        }else if(id == R.id.menu_setftp) {
+            final EditText inputServer = new EditText(this);
+            inputServer.setFilters(new InputFilter[]{new InputFilter.LengthFilter(50)});
+            inputServer.setText(FtpFile.getHostIp());
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("输入ftp服务器地址").setView(inputServer);
+            builder.setNegativeButton("取消", null);
+            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    String _sign = inputServer.getText().toString();
+                    if(_sign!=null && !_sign.isEmpty()) {
+                        FtpFile.setHostIp(_sign);
+                    }
+                }
+            });
+            builder.show();
+        } else {
             File fileDir = new File(BACKUP_FILE_FOLDER);
             File[] files = fileDir.listFiles();
             for(File f : files) {
@@ -158,6 +178,20 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onTouchEvent(motionEvent);
     }
+
+//    @Override
+//    public Resources getResources() {
+//        Resources resources = super.getResources();
+//        Configuration configuration = resources.getConfiguration();
+//        configuration.setToDefaults();
+//        resources.updateConfiguration(configuration,resources.getDisplayMetrics() );
+//        return resources;
+//    }
+//
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//    }
 
     private void initMenuBar() {
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -447,9 +481,12 @@ public class MainActivity extends AppCompatActivity {
                 }
                 case HandlerMsgId.FTP_FILE_UPLOAD_PROGRESS:
                 case HandlerMsgId.FTP_FILE_DOWNLOAD_PROGRESS:
+                case HandlerMsgId.FTP_FILE_SET_HOST_IP_SUCCESS:
+                case HandlerMsgId.FTP_FILE_SET_HOST_IP_FAIL:
                 case HandlerMsgId.RW_FILE_READ_PROGRESS:
                 case HandlerMsgId.RW_FILE_WRITE_PROGRESS:
                 case HandlerMsgId.RW_FILE_DELETE_PROGRESS:
+                case HandlerMsgId.FTP_FILE_CONNECT_FAIL:
                     MainActivity.this.textLogInfo.setText("*******" + (String) msg.obj);
                     break;
 

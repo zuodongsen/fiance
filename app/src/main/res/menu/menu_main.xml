@@ -20,8 +20,7 @@
         android:actionLayout="@layout/actionbar_badge_layout"
         android:orderInCategory="3"
         android:title="@string/deletebackup"
-        app:showAsAction="never" />/>
-
+        app:showAsAction="never" />
     <item
         android:id="@+id/menu_uploadbackup"
         android:actionLayout="@layout/actionbar_badge_layout"
@@ -30,6 +29,14 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/menu_remoteexport"
+        android:actionLayout="@layout/actionbar_badge_layout"
         android:orderInCategory="5"
-        android:title="@string/remoteexport" />/>
+        android:title="@string/remoteexport"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/menu_setftp"
+        android:actionLayout="@layout/actionbar_badge_layout"
+        android:orderInCategory="6"
+        android:title="@string/setftp"
+        app:showAsAction="never" />
 </menu>
