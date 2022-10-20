@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textfat_id"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/txtfat_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textfat_n1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/morning" />
+
+        <TextView
+            android:id="@+id/textfat_morning"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/textfat_n2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/noon" />
+
+        <TextView
+            android:id="@+id/textfat_noon"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/textfat_n3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/night" />
+
+        <TextView
+            android:id="@+id/textfat_night"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/textfat_n4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/rope" />
+
+        <TextView
+            android:id="@+id/textfat_rope"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/textfat_n5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/circle" />
+
+        <TextView
+            android:id="@+id/textfat_circle"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:text="TextView" />
+    </LinearLayout>
+
+    <!-- listview 当我们设置成wrap_content的时候，系统在绘制界面的时候，并不确定listView的实际height，
+    这个时候需要加载一次getView()方法，来计算实际的height,注意，系统只会创建一个item,由此一个item,
+    和listView中需要显示的个数来计算，listView实际的height,等确定listView实际的height后，
+    再去创建实际需要的item,也就出现getView()被调用了两遍的情况了 -->
+</LinearLayout>

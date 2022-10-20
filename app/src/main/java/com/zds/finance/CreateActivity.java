@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.zds.common.DateTimeTrans;
+
 import java.util.Calendar;
 
 public class CreateActivity extends AppCompatActivity {
@@ -23,7 +25,8 @@ public class CreateActivity extends AppCompatActivity {
             "买菜", "水果", "话费", "水费", "电费",
             "保险", "交通", "养车", "服装", "长辈",
             "居家", "养娃", "书籍", "电子", "理财",
-            "餐饮", "购物", "旅游", "医疗", "其他"};
+            "餐饮", "购物", "旅游", "医疗", "孕期",
+            "其他"};
 
     Calendar calendar = null;
     int year = 0; // 得到当前年
@@ -45,7 +48,7 @@ public class CreateActivity extends AppCompatActivity {
             this.txtInfo.setText(finance.info);
             this.txtAmount.setText(String.valueOf(finance.amount));
             this.spnType.setSelection(getTypeIdByName(finance.type));
-            this.calendar.setTime(Finance.getDate(finance.date));
+            this.calendar.setTime(DateTimeTrans.getDate(finance.date));
         }
         this.year = calendar.get(Calendar.YEAR); // 得到当前年
         this.month = calendar.get(Calendar.MONTH) + 1; // 得到当前月

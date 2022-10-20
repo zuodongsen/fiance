@@ -21,10 +21,10 @@ import java.util.List;
 
 public class PopListViewAdapter extends ArrayAdapter<String>{
     private int listViewResId;
-    static int selectCmd;
-    final static int CMD_INVALID = -1;
-    final static int CMD_DEL = 0;
-    final static int CMD_MODIFY = 1;
+    public static int selectCmd;
+    public final static int CMD_INVALID = -1;
+    public final static int CMD_DEL = 0;
+    public final static int CMD_MODIFY = 1;
     final static List<String> listData = Arrays.asList("删除", "修改");
     public PopListViewAdapter(List<String> listData_, Context context, int resource) {
         super(context, resource, listData);

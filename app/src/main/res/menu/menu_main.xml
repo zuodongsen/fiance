@@ -39,4 +39,10 @@
         android:orderInCategory="6"
         android:title="@string/setftp"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_exchange"
+        android:actionLayout="@layout/actionbar_badge_layout"
+        android:orderInCategory="7"
+        android:title="@string/exchange"
+        app:showAsAction="never" />
 </menu>

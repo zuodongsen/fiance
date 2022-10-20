@@ -3,8 +3,6 @@ package com.zds.finance;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,13 +15,23 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.zds.common.DataBaseHelper;
+import com.zds.common.DateTimeTrans;
+import com.zds.common.FileRWThread;
+import com.zds.common.FtpFile;
+import com.zds.common.HandlerMsgId;
+import com.zds.fat.Fat;
+import com.zds.fat.FatAdapter;
+import com.zds.fat.FatCreateActivity;
+import com.zds.fat.PopWin;
+import com.zds.fat.PopWinAdapter;
 import com.zds.finance.databinding.ActivityMainBinding;
 
 import java.io.File;
@@ -54,6 +62,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView textLogInfo;
     private int selectYear;
     private int selectMonth;
+
+    private final int CRU_SELECT_ACTIVITY_FRANCE = 0;
+    private final int CRU_SELECT_ACTIVITY_FAT = 1;
+    private int CRU_SELECT_ACTIVITY = CRU_SELECT_ACTIVITY_FRANCE;
+
     private float tatalAmount;
 
     final static List<String> popListData = Arrays.asList("删除", "修改");
@@ -115,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                 dataInfos.add(it.toJson());
             }
             FileRWThread csvWriteThread = new FileRWThread(dataInfos, BACKUP_FILE_FOLDER,
-                    "amount_" + Finance.getNowDateTime2String() + ".txt", FileRWThread.FILE_RW_TYPE_WRITE);
+                    "amount_" + DateTimeTrans.getNowDateTime2String() + ".txt", FileRWThread.FILE_RW_TYPE_WRITE);
             csvWriteThread.run();
             return true;
         }else if(id == R.id.menu_remoteexport) {
@@ -137,6 +150,17 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
             builder.show();
+        } else if(id == R.id.menu_exchange) {
+            this.CRU_SELECT_ACTIVITY = (this.CRU_SELECT_ACTIVITY == CRU_SELECT_ACTIVITY_FRANCE ?
+                                        CRU_SELECT_ACTIVITY_FAT : CRU_SELECT_ACTIVITY_FRANCE);
+            this.listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    return false;
+                }
+            });
+            this.reflushListViewData();
+
         } else {
             File fileDir = new File(BACKUP_FILE_FOLDER);
             File[] files = fileDir.listFiles();
@@ -315,7 +339,7 @@ public class MainActivity extends AppCompatActivity {
 
     /* listview */
     private void initListView() {
-        Finance.initDb(MainActivity.this);
+        DataBaseHelper.initDb(MainActivity.this);
         this.resetPopListSelect();
         this.listView = (ListView) findViewById(R.id.list_view);
         this.reflushListViewData();
@@ -340,7 +364,7 @@ public class MainActivity extends AppCompatActivity {
                 continue;
             }
             if(!financeList.isEmpty()){
-                this.financeAdapterList.add(new FinanceAdapter(financeList, Finance.getMonthDay2String(lastDate), MainActivity.this, R.layout.listview_finance));
+                this.financeAdapterList.add(new FinanceAdapter(financeList, DateTimeTrans.getMonthDay2String(lastDate), MainActivity.this, R.layout.listview_finance));
                 this.fianceListArray.add(new ArrayList<>());
                 financeList = this.fianceListArray.get(this.fianceListArray.size() - 1);
             }
@@ -348,22 +372,28 @@ public class MainActivity extends AppCompatActivity {
             lastDate = f.date;
         }
         if(!financeList.isEmpty()){
-            this.financeAdapterList.add(new FinanceAdapter(financeList, Finance.getMonthDay2String(lastDate), MainActivity.this, R.layout.listview_finance));
+            this.financeAdapterList.add(new FinanceAdapter(financeList, DateTimeTrans.getMonthDay2String(lastDate), MainActivity.this, R.layout.listview_finance));
         }
     }
 
     public void reflushListViewData() {
-        this.listData = Finance.getOneMonthFormDb(this.selectYear, this.selectMonth);
-        this.genFinanceDateList();
-        this.financeDateAdapter = new FinanceDateAdapter(this.financeAdapterList, MainActivity.this, R.layout.listview_date);
-        this.listView.setAdapter(financeDateAdapter);
-        if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_MODIFY) {
-            this.resetPopListSelect();
-        }
-        setListViewHeightBasedOnChildren(this.listView);
+        if(this.CRU_SELECT_ACTIVITY == CRU_SELECT_ACTIVITY_FRANCE) {
+            this.listData = Finance.getOneMonthFormDb(this.selectYear, this.selectMonth);
+            this.genFinanceDateList();
+            this.financeDateAdapter = new FinanceDateAdapter(this.financeAdapterList, MainActivity.this, R.layout.listview_date);
+            this.listView.setAdapter(financeDateAdapter);
+            if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_MODIFY) {
+                this.resetPopListSelect();
+            }
+            setListViewHeightBasedOnChildren(this.listView);
 
-        this.textMonth.setText(String.format("%d年%02d月", this.selectYear, this.selectMonth));
-        this.textTotalAmount.setText(String.format("%.2f", this.tatalAmount));
+            this.textMonth.setText(String.format("%d年%02d月", this.selectYear, this.selectMonth));
+            this.textTotalAmount.setText(String.format("%.2f", this.tatalAmount));
+        }else {
+            FatAdapter.setListViewAdapter(this.selectYear, this.selectMonth, MainActivity.this, this.listView, R.layout.listview_fat);
+            this.textTotalAmount.setText(String.format("%.2f", 0.0));
+        }
+
     }
 
     // 解决listview 只能显示一条记录的问题
@@ -413,19 +443,24 @@ public class MainActivity extends AppCompatActivity {
                 if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_DEL) {
                     MainActivity.this.showDeleteAlertDialog("删除记账！");
                 }else {
-                    Intent intent = new Intent(MainActivity.this, CreateActivity.class);
-                    startActivityForResult(intent, REQUEST);
+                    startActivity(CreateActivity.class);
                 }
             }
         });
     }
 
+    public void startActivity(Class c) {
+        Intent intent = new Intent(MainActivity.this, c);
+        startActivityForResult(intent, REQUEST);
+    }
+
     private void resetPopListSelect() {
         MainActivity.selectListViewFinanceId = INVALID_LIST_VIEW_ITEM_ID;
         PopListViewAdapter.selectCmd = PopListViewAdapter.CMD_INVALID;
+        PopWin.resetPopListSelect();
     }
 
-    private void showDeleteAlertDialog(String title){
+    public void showDeleteAlertDialog(String title){
         new AlertDialog.Builder(MainActivity.this)
                 .setTitle(title)
                 .setIcon(android.R.drawable.ic_delete)
@@ -433,9 +468,15 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("是", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Finance.deleteFromDb(MainActivity.selectListViewFinanceId);
+                        if(MainActivity.this.CRU_SELECT_ACTIVITY == CRU_SELECT_ACTIVITY_FRANCE) {
+                            Finance.deleteFromDb(MainActivity.selectListViewFinanceId);
+                        }else {
+                            Fat.deleteFromDb(PopWin.selectListViewId);
+                        }
+
                         MainActivity.this.reflushListViewData();
                         MainActivity.this.resetPopListSelect();
+
                     }
                 })
                 .setNegativeButton("否", new DialogInterface.OnClickListener() {
@@ -452,7 +493,6 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .show();
     }
-
 
 
     /* handler */
@@ -495,13 +535,14 @@ public class MainActivity extends AppCompatActivity {
     };
     }
 
-
-
     public void btn_create(View view) {
-        Button btn = (Button)view;
-        int a = btn.getId();
-        Intent intent = new Intent(MainActivity.this, CreateActivity.class);
-        startActivityForResult(intent, REQUEST);
+        if(this.CRU_SELECT_ACTIVITY == CRU_SELECT_ACTIVITY_FRANCE) {
+            Intent intent = new Intent(MainActivity.this, CreateActivity.class);
+            startActivityForResult(intent, REQUEST);
+        }else {
+            Intent intent = new Intent(MainActivity.this, FatCreateActivity.class);
+            startActivityForResult(intent, REQUEST);
+        }
 
     }
 

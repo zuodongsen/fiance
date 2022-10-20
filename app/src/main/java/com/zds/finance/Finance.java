@@ -3,10 +3,11 @@ package com.zds.finance;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 import android.view.View;
-import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.zds.common.DataBaseHelper;
+import com.zds.common.DateTimeTrans;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,7 +35,7 @@ public class Finance {
 
     public Finance(String name_, String date_, float amount_, String type_) {
         this.info = name_;
-        this.date = getString2Date(date_);
+        this.date = DateTimeTrans.getString2Date(date_);
         this.id = 0;
         this.amount = amount_;
         this.type = type_;
@@ -81,7 +82,7 @@ public class Finance {
     }
 
     public String getDate2String() {
-        return getDate2String(this.date);
+        return DateTimeTrans.getDate2String(this.date);
     }
 
     public String toString() {
@@ -102,65 +103,21 @@ public class Finance {
         return js.toString();
     }
 
-    public static String getDate2String(Date date_) {
-        SimpleDateFormat formatter = new SimpleDateFormat ("yyyy年MM月dd日");
-        return formatter.format(date_);
-    }
-
-    public static String getMonthDay2String(Date date_) {
-        SimpleDateFormat formatter = new SimpleDateFormat ("MM月dd日");
-        return formatter.format(date_);
-    }
-
-    public static Date getDate(long date_) {
-        Date dateTmp = new Date();
-        dateTmp.setTime(date_);
-        return dateTmp;
-    }
-
-    public static String getDate2String(long date_) {
-        Date dateTmp = getDate(date_);
-        return getDate2String(dateTmp);
-    }
-
-    public static String getMonthDay2String(long date_) {
-        Date dateTmp = new Date();
-        dateTmp.setTime(date_);
-        return getMonthDay2String(dateTmp);
-    }
-
-    public static String getNowDateTime2String() {
-        Date dateTmp = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat ("yyyy_MM_dd_HH_mm");
-        return formatter.format(dateTmp);
-    }
-
-    public static long getString2Date(String date_) {
-        Date dateTmp;
-        SimpleDateFormat formatter = new SimpleDateFormat ("yyyy年MM月dd日");
-        try {
-            dateTmp = formatter.parse(date_);
-        } catch (ParseException e) {
-            dateTmp = new Date();
-        }
-        return dateTmp.getTime();
-    }
-
     public static void clearDb() {
-        db.execSQL("delete from finance");
+        DataBaseHelper.dbExecSQL("delete from finance");
     }
 
     public static void deleteFromDb(int financeId_) {
-        db.execSQL("delete from finance where id = " + financeId_);
+        DataBaseHelper.dbExecSQL("delete from finance where id = " + financeId_);
     }
 
     public static void updateToDb(int financeId_, Finance finance_) {
-        db.execSQL("update finance set " + updateColName + " where id = " + financeId_,
+        DataBaseHelper.dbExecSQL("update finance set " + updateColName + " where id = " + financeId_,
                 new Object[]{finance_.info, finance_.date, finance_.amount, finance_.type});
     }
 
     public static void insertToDb(Finance finance_) {
-        db.execSQL("insert into finance(" + insertColName + ") values(?, ?, ?, ?)",
+        DataBaseHelper.dbExecSQL("insert into finance(" + insertColName + ") values(?, ?, ?, ?)",
                 new Object[]{finance_.info, finance_.date, finance_.amount, finance_.type});
     }
 
@@ -174,7 +131,7 @@ public class Finance {
 
     public static Finance getOneFormDb(int financeId_) {
         List<Finance> allFinances = new ArrayList<Finance>();
-        Cursor cursor = db.rawQuery("select " + selectColName + " from finance where id = " + financeId_, null);
+        Cursor cursor = DataBaseHelper.getDb().rawQuery("select " + selectColName + " from finance where id = " + financeId_, null);
         if(cursor == null) {
             return null;
         }
@@ -189,10 +146,10 @@ public class Finance {
     public static List<Finance> getOneMonthFormDb(int year, int month) {
         String dataStartStr = String.format("%d年%02d月%02d日", year, month, 1);  //yyyy年MM月dd日
         String dataEndStr = String.format("%d年%02d月%02d日", year, month + 1, 1);  //yyyy年MM月dd日
-        long dataStart = getString2Date(dataStartStr);
-        long dataEnd = getString2Date(dataEndStr);
+        long dataStart = DateTimeTrans.getString2Date(dataStartStr);
+        long dataEnd = DateTimeTrans.getString2Date(dataEndStr);
         List<Finance> allFinances = new ArrayList<Finance>();
-        Cursor cursor = db.rawQuery("select " + selectColName + " from finance where date >= " +
+        Cursor cursor = DataBaseHelper.getDb().rawQuery("select " + selectColName + " from finance where date >= " +
                             dataStart + " and date < " + dataEnd + " order by date", null);
         if(cursor == null) {
             return allFinances;
@@ -209,7 +166,7 @@ public class Finance {
 
     public static List<Finance> getAllFormDb() {
         List<Finance> allFinances = new ArrayList<Finance>();
-        Cursor cursor = db.rawQuery("select " + selectColName + " from finance order by date", null);
+        Cursor cursor = DataBaseHelper.getDb().rawQuery("select " + selectColName + " from finance order by date", null);
         if(cursor == null) {
             return allFinances;
         }
@@ -222,22 +179,12 @@ public class Finance {
         return allFinances;
     }
 
-    public static void initDb(Context context) {
-        if(dbHelper != null) {
-            return;
-        }
-        dbHelper = new DataBaseHelper(context, "finance.db", null, 1);
-        db = dbHelper.getWritableDatabase();
-//        Finance.clearDb(context);
-    }
-
     public String info;
     public long date;
     public float amount;
     public String type;
     public int id;
-    private static DataBaseHelper dbHelper = null;
-    private static SQLiteDatabase db = null;
+
     private final static String insertColName= "name, date, amount, type";
     private final static String selectColName= "id, " + insertColName;
     private final static String updateColName= insertColName.replace(",", " = ?,") + " = ?";
