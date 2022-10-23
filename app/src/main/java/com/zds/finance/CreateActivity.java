@@ -3,16 +3,19 @@ package com.zds.finance;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.zds.common.DateTimeTrans;
+import com.zds.common.ScanRadar;
 
 import java.util.Calendar;
 
@@ -54,6 +57,16 @@ public class CreateActivity extends AppCompatActivity {
         this.month = calendar.get(Calendar.MONTH) + 1; // 得到当前月
         this.day = calendar.get(Calendar.DAY_OF_MONTH); // 得到当前日
         this.txtDate.setText(String.format("%d年%02d月%02d日", year, month, day));
+
+//        LinearLayout linearLayout =
+//                (LinearLayout)findViewById(R.id.aaaaa);
+//
+//        Canvas canvas = new Canvas();
+//        ScanRadar scanRadar = new ScanRadar(this);
+//
+//        linearLayout.addView(scanRadar);
+
+
     }
 
     private void initSpinnerType() {

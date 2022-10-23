@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+
+        android:layout_width="match_parent"
+        android:layout_height="35dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_menu"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/golden"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme"
+            app:popupTheme="@style/Theme.Finance.PopupOverlay" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/bt_left"
+            android:layout_width="50dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="4dp"
+            android:layout_toLeftOf="@id/text_month"
+            android:background="@android:color/transparent"
+            android:includeFontPadding="false"
+            android:onClick="btn_dateChange"
+            android:text="@string/left"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/text_month"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="8dp"
+            android:text="month"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/bt_right"
+            android:layout_width="50dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:layout_toRightOf="@id/text_month"
+            android:background="@android:color/transparent"
+            android:includeFontPadding="false"
+            android:onClick="btn_dateChange"
+            android:text="@string/right"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/text_total_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/bt_create"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="8dp"
+            android:layout_toRightOf="@id/bt_right"
+            android:text="total_a"
+            android:textSize="22sp" />
+
+        <Button
+            android:id="@+id/bt_create"
+            android:layout_width="40dp"
+            android:layout_height="35dp"
+            android:background="@android:color/transparent"
+            android:backgroundTint="@null"
+            android:includeFontPadding="false"
+            android:onClick="btn_create"
+            android:paddingTop="0dp"
+            android:text="+"
+            android:textSize="32sp"
+            tools:fontFamily="sans-serif-light" />
+
+        <Button
+            android:id="@+id/bt_showCurMonth"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="2dp"
+            android:layout_toLeftOf="@id/bt_left"
+            android:background="@android:color/transparent"
+            android:fontFamily="serif-monospace"
+            android:includeFontPadding="false"
+            android:onClick="btn_dateChange"
+            android:text="O"
+            android:textSize="34sp" />
+
+    </RelativeLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+
+        android:layout_marginBottom="70dp">
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ListView
+                android:id="@+id/list_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:background="#FFFFFF" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="-70dp"
+        android:orientation="horizontal">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tablayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textAlignment="viewEnd">
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/notefiance" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/statsfiance" />
+
+        </com.google.android.material.tabs.TabLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/text_logInfo"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginTop="0dp"
+        android:background="#28039BE5"
+        android:gravity="start|center_vertical"
+        android:textColor="#E66868"
+        android:textSize="12sp" />
+
+
+</LinearLayout>

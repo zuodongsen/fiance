@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Handler;
 import android.os.Message;
 import android.text.InputFilter;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -17,16 +18,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.google.android.material.tabs.TabLayout;
 import com.zds.common.DataBaseHelper;
 import com.zds.common.DateTimeTrans;
 import com.zds.common.FileRWThread;
 import com.zds.common.FtpFile;
 import com.zds.common.HandlerMsgId;
+import com.zds.common.ScanRadar;
 import com.zds.fat.Fat;
 import com.zds.fat.FatAdapter;
 import com.zds.fat.FatCreateActivity;
@@ -89,14 +93,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         this.initMenuBar();
-        this.initSelectYearMonth();
-        this.initTextView();
-        this.initListView();
-        this.initPopListView();
+        this.initTabLayout();
+
         this.initHandler();
         this.initStaticValue();
         this.initFileDirc();
+
     }
 
     @Override
@@ -228,6 +232,55 @@ public class MainActivity extends AppCompatActivity {
         FILE_FOLDER = this.getFilesDir().toString() + File.separator;
         BACKUP_FILE_FOLDER = FILE_FOLDER + BACKUP_PATH;
         this.createFolder(BACKUP_FILE_FOLDER);
+    }
+
+    private void initFinanceList() {
+        this.initSelectYearMonth();
+        this.initTextView();
+        this.initListView();
+        this.initPopListView();
+    }
+
+    private void setFianceListView() {
+        View view1 = LayoutInflater.from(this).inflate(R.layout.activity_fiancelist, null);
+        LinearLayout linearLayout = findViewById(R.id.layout_fiance);
+        linearLayout.removeAllViews();
+        linearLayout.addView(view1);
+        this.initFinanceList();
+    }
+
+    private void setFinanceStatsView() {
+        View view1 = LayoutInflater.from(this).inflate(R.layout.activity_fiancestats, null);
+        LinearLayout linearLayout = findViewById(R.id.layout_fiance);
+        linearLayout.removeAllViews();
+        linearLayout.addView(new ScanRadar(this));
+    }
+
+    private void initTabLayout() {
+        TabLayout tabLayout = findViewById(R.id.tablayout);
+        setFianceListView();
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if(tab.getPosition() == 0) {
+                    MainActivity.this.setFianceListView();
+                }else {
+                    MainActivity.this.setFinanceStatsView();
+                }
+                System.out.println(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
     }
 
     private void createFolder(String folder) {
@@ -552,6 +605,7 @@ public class MainActivity extends AppCompatActivity {
             this.selectMonth += 12;
             this.selectYear --;
         }
+        if(this.selectMonth == 12) return;
         this.selectYear += (this.selectMonth / 12);
         this.selectMonth = (this.selectMonth % 12);
     }
