@@ -143,14 +143,14 @@ public class Finance {
         return allFinances.get(0);
     }
 
-    public static List<Finance> getOneMonthFormDb(int year, int month) {
-        String dataStartStr = String.format("%d年%02d月%02d日", year, month, 1);  //yyyy年MM月dd日
-        String dataEndStr = String.format("%d年%02d月%02d日", year, month + 1, 1);  //yyyy年MM月dd日
+    public static List<Finance> getPeriodFormDb(int beginYear, int beginMonth, int endYear, int endMonth) {
+        String dataStartStr = String.format("%d年%02d月%02d日", beginYear, beginMonth, 1);  //yyyy年MM月dd日
+        String dataEndStr = String.format("%d年%02d月%02d日", endYear, endMonth, 1);  //yyyy年MM月dd日
         long dataStart = DateTimeTrans.getString2Date(dataStartStr);
         long dataEnd = DateTimeTrans.getString2Date(dataEndStr);
         List<Finance> allFinances = new ArrayList<Finance>();
         Cursor cursor = DataBaseHelper.getDb().rawQuery("select " + selectColName + " from finance where date >= " +
-                            dataStart + " and date < " + dataEnd + " order by date", null);
+                dataStart + " and date < " + dataEnd + " order by date", null);
         if(cursor == null) {
             return allFinances;
         }
@@ -159,10 +159,45 @@ public class Finance {
                     cursor.getLong(2), cursor.getFloat(3), cursor.getString(4));
             allFinances.add(finance);
         }
-
         return allFinances;
     }
 
+    public static List<Finance> getOneMonthFormDb(int year, int month) {
+        return getPeriodFormDb(year, month, year, month + 1);
+    }
+
+    public static List<Finance> getOneYearFormDb(int year) {
+        return getPeriodFormDb(year, 1, year + 1, 1);
+    }
+
+    public static float getFloatFromJson(JSONObject js, String key) {
+        if(!js.has(key)){
+            return 0;
+        }
+        try {
+            return (float) js.getDouble(key);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public static JSONObject toJsonByType(List<Finance> finances) {
+        JSONObject js = new JSONObject();
+        try {
+            for(Finance it : finances) {
+
+                if(!js.has(it.type))
+                    js.put(it.type, it.amount);
+                else
+                    js.put(it.type, js.getDouble(it.type) + it.amount);
+
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return js;
+    }
 
     public static List<Finance> getAllFormDb() {
         List<Finance> allFinances = new ArrayList<Finance>();
@@ -175,7 +210,6 @@ public class Finance {
                     cursor.getLong(2), cursor.getFloat(3), cursor.getString(4));
             allFinances.add(finance);
         }
-
         return allFinances;
     }
 

@@ -3,6 +3,7 @@ package com.zds.finance;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,6 +31,7 @@ import com.zds.common.DateTimeTrans;
 import com.zds.common.FileRWThread;
 import com.zds.common.FtpFile;
 import com.zds.common.HandlerMsgId;
+import com.zds.common.PieData;
 import com.zds.common.ScanRadar;
 import com.zds.fat.Fat;
 import com.zds.fat.FatAdapter;
@@ -37,6 +39,9 @@ import com.zds.fat.FatCreateActivity;
 import com.zds.fat.PopWin;
 import com.zds.fat.PopWinAdapter;
 import com.zds.finance.databinding.ActivityMainBinding;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -253,7 +258,25 @@ public class MainActivity extends AppCompatActivity {
         View view1 = LayoutInflater.from(this).inflate(R.layout.activity_fiancestats, null);
         LinearLayout linearLayout = findViewById(R.id.layout_fiance);
         linearLayout.removeAllViews();
-        linearLayout.addView(new ScanRadar(this));
+        linearLayout.addView(view1);
+        LinearLayout layoutMonth = view1.findViewById(R.id.layout_month);
+        TextView txtYear = findViewById(R.id.txtstats_year);
+        List<Finance> finances = Finance.getOneYearFormDb(this.selectYear);
+        JSONObject js = Finance.toJsonByType(finances);
+
+
+        List<PieData> pieDataList = new ArrayList<>();
+
+        for(String it : CreateActivity.amountType) {
+            if(!js.has(it)) {
+                continue;
+            }
+            float amount = Finance.getFloatFromJson(js, it);
+            pieDataList.add(new PieData(amount, it));
+        }
+        ScanRadar scanRadar = new ScanRadar(this, pieDataList);
+        layoutMonth.addView(scanRadar);
+        txtYear.setText(String.valueOf(this.selectYear) + "年 共消费RMB：" + String.valueOf(scanRadar.pieValueSum));
     }
 
     private void initTabLayout() {
