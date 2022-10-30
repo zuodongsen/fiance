@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class ScanRadar extends View {
+public class PieChart extends View {
     private List<PieData> data;
 
     private final int COLOR_MIN = 1;
@@ -24,15 +24,15 @@ public class ScanRadar extends View {
 
     public float pieValueSum;
 
-    public ScanRadar(Context context) {
+    public PieChart(Context context) {
         super(context);
     }
 
-    public ScanRadar(Context context,  AttributeSet attrs) {
+    public PieChart(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public ScanRadar(Context context, List<PieData> data_) {
+    public PieChart(Context context, List<PieData> data_) {
         super(context);
         this.data = data_;
         genaratePidAngle();

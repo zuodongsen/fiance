@@ -29,7 +29,7 @@ public class FatAdapter extends ArrayAdapter<Fat> {
         fatList = Fat.getOneMonthFormDb(year, month);
         fatAdapter = new FatAdapter(fatList, context_, txtViewResId_);
         listView.setAdapter(fatAdapter);
-        PopWin.initPopListView(context_);
+//        PopWin.initPopListView(context_);
         listView.setOnItemLongClickListener(PopWin.itemLongClickListener);
     }
 

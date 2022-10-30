@@ -170,12 +170,24 @@ public class Finance {
         return getPeriodFormDb(year, 1, year + 1, 1);
     }
 
-    public static float getFloatFromJson(JSONObject js, String key) {
+    public static float getAmountFromJson(JSONObject js, String key) {
         if(!js.has(key)){
             return 0;
         }
         try {
-            return (float) js.getDouble(key);
+            return (float) js.getJSONObject(key).getDouble("amount");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public static int getNumFromJson(JSONObject js, String key) {
+        if(!js.has(key)){
+            return 0;
+        }
+        try {
+            return js.getJSONObject(key).getInt("num");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -186,12 +198,12 @@ public class Finance {
         JSONObject js = new JSONObject();
         try {
             for(Finance it : finances) {
-
-                if(!js.has(it.type))
-                    js.put(it.type, it.amount);
-                else
-                    js.put(it.type, js.getDouble(it.type) + it.amount);
-
+                if(!js.has(it.type)) {
+                    js.put(it.type, new JSONObject("{\"amount\":0, \"num\": 0}"));
+                }
+                JSONObject jsTmp = js.getJSONObject(it.type);
+                jsTmp.put("amount", jsTmp.getDouble("amount") + it.amount);
+                jsTmp.put("num", jsTmp.getInt("num") + 1);
             }
         } catch (JSONException e) {
             e.printStackTrace();

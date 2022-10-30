@@ -3,7 +3,6 @@ package com.zds.finance;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,42 +10,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Handler;
 import android.os.Message;
 import android.text.InputFilter;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.google.android.material.tabs.TabLayout;
-import com.zds.common.DataBaseHelper;
 import com.zds.common.DateTimeTrans;
 import com.zds.common.FileRWThread;
 import com.zds.common.FtpFile;
 import com.zds.common.HandlerMsgId;
-import com.zds.common.PieData;
-import com.zds.common.ScanRadar;
-import com.zds.fat.Fat;
-import com.zds.fat.FatAdapter;
-import com.zds.fat.FatCreateActivity;
-import com.zds.fat.PopWin;
-import com.zds.fat.PopWinAdapter;
+import com.zds.fat.FatList;
 import com.zds.finance.databinding.ActivityMainBinding;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 
     //adb path C:\Users\dosens\AppData\Local\Android\Sdk\platform-tools
@@ -59,26 +38,13 @@ git config --global --unset https.proxy
 public class MainActivity extends AppCompatActivity {
     final static int REQUEST=10;
 
-    private List<List<Finance>> fianceListArray = new ArrayList<>();
-    private List<Finance> listData = new ArrayList<>();
-    private List<FinanceAdapter> financeAdapterList = new ArrayList<>();
-    private FinanceDateAdapter financeDateAdapter;
 
-    private ListView listView;
-    private ListView popListView;
-    private TextView textMonth;
-    private TextView textTotalAmount;
     private TextView textLogInfo;
-    private int selectYear;
-    private int selectMonth;
 
     private final int CRU_SELECT_ACTIVITY_FRANCE = 0;
     private final int CRU_SELECT_ACTIVITY_FAT = 1;
     private int CRU_SELECT_ACTIVITY = CRU_SELECT_ACTIVITY_FRANCE;
 
-    private float tatalAmount;
-
-    final static List<String> popListData = Arrays.asList("删除", "修改");
     static PopupWindow popWin;
     static int selectListViewFinanceId;
     static int selectFileIndexForInput;
@@ -88,23 +54,28 @@ public class MainActivity extends AppCompatActivity {
     static List<String> backupFileNameList = new ArrayList<>();
 
     final static int INVALID_FILE_SELECT_ID = -1;
-    final static int INVALID_LIST_VIEW_ITEM_ID = -1;
     private static String FILE_FOLDER;
     private static String BACKUP_FILE_FOLDER;
     private static final String BACKUP_PATH = "amount_backup";
     public static Handler handler;
 
+    private FinanceList financeList;
+    private FinanceStats financeStats;
+
+    private FatList fatList;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         this.initMenuBar();
         this.initTabLayout();
-
         this.initHandler();
         this.initStaticValue();
         this.initFileDirc();
+
+        this.textLogInfo = (TextView)findViewById(R.id.text_logInfo);
 
     }
 
@@ -118,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        this.reflushListViewData();
+        this.setLayoutContainer();
     }
 
     /* menu bar */
@@ -162,13 +133,8 @@ public class MainActivity extends AppCompatActivity {
         } else if(id == R.id.menu_exchange) {
             this.CRU_SELECT_ACTIVITY = (this.CRU_SELECT_ACTIVITY == CRU_SELECT_ACTIVITY_FRANCE ?
                                         CRU_SELECT_ACTIVITY_FAT : CRU_SELECT_ACTIVITY_FRANCE);
-            this.listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                @Override
-                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                    return false;
-                }
-            });
-            this.reflushListViewData();
+            this.setLayoutContainer();
+
 
         } else {
             File fileDir = new File(BACKUP_FILE_FOLDER);
@@ -191,26 +157,34 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private float touchDownX = 0f;
-    private float touchUpX = 0f;
-    private final int TOUCH_MOVE_MIN_X = 100;
-    @Override
-    public  boolean onTouchEvent(MotionEvent motionEvent) {
-        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-            touchDownX = motionEvent.getX();
-            return super.onTouchEvent(motionEvent);
-        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-            touchUpX = motionEvent.getX();
-            if (touchUpX - touchDownX > TOUCH_MOVE_MIN_X) {
-                modifyListViewShowMonth(-1);
-                reflushListViewData();
-            } else if (touchDownX - touchUpX > TOUCH_MOVE_MIN_X) {
-                modifyListViewShowMonth(1);
-                reflushListViewData();
-            }
+    void setLayoutContainer() {
+        if(this.CRU_SELECT_ACTIVITY == CRU_SELECT_ACTIVITY_FRANCE) {
+            this.financeList.setFianceListView();
+        }else {
+            this.fatList.setFatListView();
         }
-        return super.onTouchEvent(motionEvent);
     }
+
+//    private float touchDownX = 0f;
+//    private float touchUpX = 0f;
+//    private final int TOUCH_MOVE_MIN_X = 100;
+//    @Override
+//    public  boolean onTouchEvent(MotionEvent motionEvent) {
+//        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+//            touchDownX = motionEvent.getX();
+//            return super.onTouchEvent(motionEvent);
+//        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+//            touchUpX = motionEvent.getX();
+//            if (touchUpX - touchDownX > TOUCH_MOVE_MIN_X) {
+//                modifyListViewShowMonth(-1);
+//                reflushListViewData();
+//            } else if (touchDownX - touchUpX > TOUCH_MOVE_MIN_X) {
+//                modifyListViewShowMonth(1);
+//                reflushListViewData();
+//            }
+//        }
+//        return super.onTouchEvent(motionEvent);
+//    }
 
 //    @Override
 //    public Resources getResources() {
@@ -239,59 +213,24 @@ public class MainActivity extends AppCompatActivity {
         this.createFolder(BACKUP_FILE_FOLDER);
     }
 
-    private void initFinanceList() {
-        this.initSelectYearMonth();
-        this.initTextView();
-        this.initListView();
-        this.initPopListView();
-    }
-
-    private void setFianceListView() {
-        View view1 = LayoutInflater.from(this).inflate(R.layout.activity_fiancelist, null);
-        LinearLayout linearLayout = findViewById(R.id.layout_fiance);
-        linearLayout.removeAllViews();
-        linearLayout.addView(view1);
-        this.initFinanceList();
-    }
-
-    private void setFinanceStatsView() {
-        View view1 = LayoutInflater.from(this).inflate(R.layout.activity_fiancestats, null);
-        LinearLayout linearLayout = findViewById(R.id.layout_fiance);
-        linearLayout.removeAllViews();
-        linearLayout.addView(view1);
-        LinearLayout layoutMonth = view1.findViewById(R.id.layout_month);
-        TextView txtYear = findViewById(R.id.txtstats_year);
-        List<Finance> finances = Finance.getOneYearFormDb(this.selectYear);
-        JSONObject js = Finance.toJsonByType(finances);
-
-
-        List<PieData> pieDataList = new ArrayList<>();
-
-        for(String it : CreateActivity.amountType) {
-            if(!js.has(it)) {
-                continue;
-            }
-            float amount = Finance.getFloatFromJson(js, it);
-            pieDataList.add(new PieData(amount, it));
-        }
-        ScanRadar scanRadar = new ScanRadar(this, pieDataList);
-        layoutMonth.addView(scanRadar);
-        txtYear.setText(String.valueOf(this.selectYear) + "年 共消费RMB：" + String.valueOf(scanRadar.pieValueSum));
-    }
 
     private void initTabLayout() {
         TabLayout tabLayout = findViewById(R.id.tablayout);
-        setFianceListView();
+        this.financeList = new FinanceList(this);
+        this.financeStats = new FinanceStats(this);
+        this.fatList = new FatList(this);
+        this.financeList.setFianceListView();
+
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if(tab.getPosition() == 0) {
-                    MainActivity.this.setFianceListView();
+                    MainActivity.this.financeList.setFianceListView();
                 }else {
-                    MainActivity.this.setFinanceStatsView();
+                    new FinanceStats(MainActivity.this);
+                    MainActivity.this.financeStats.setFianceStatsView();
                 }
-                System.out.println(tab.getPosition());
             }
 
             @Override
@@ -400,174 +339,19 @@ public class MainActivity extends AppCompatActivity {
         MainActivity.backupFileNameList.clear();
     }
 
-    /*  */
-    private void initSelectYearMonth() {
-        Calendar calendar = Calendar.getInstance();
-        this.selectYear = calendar.get(Calendar.YEAR); // 得到当前年
-        this.selectMonth = calendar.get(Calendar.MONTH) + 1; // 得到当前月
-    }
-
-    private void initTextView() {
-        this.textMonth = (TextView) findViewById(R.id.text_month);
-        this.textTotalAmount = (TextView) findViewById(R.id.text_total_amount);
-        this.textLogInfo = (TextView) findViewById(R.id.text_logInfo);
-    }
-
-    /* listview */
-    private void initListView() {
-        DataBaseHelper.initDb(MainActivity.this);
-        this.resetPopListSelect();
-        this.listView = (ListView) findViewById(R.id.list_view);
-        this.reflushListViewData();
-    }
 
     private void initStaticValue() {
-        resetPopListSelect();
+//        resetPopListSelect();
         resetFileListSelect();
     }
 
-    private void genFinanceDateList() {
-        this.financeAdapterList.clear();
-        this.fianceListArray.clear();
-        this.fianceListArray.add(new ArrayList<>());
-        List<Finance> financeList = this.fianceListArray.get(this.fianceListArray.size() - 1);
-        long lastDate = -1;
-        this.tatalAmount = 0;
-        for (Finance f : this.listData) {
-            this.tatalAmount += f.amount;
-            if(lastDate == f.date) {
-                financeList.add(f);
-                continue;
-            }
-            if(!financeList.isEmpty()){
-                this.financeAdapterList.add(new FinanceAdapter(financeList, DateTimeTrans.getMonthDay2String(lastDate), MainActivity.this, R.layout.listview_finance));
-                this.fianceListArray.add(new ArrayList<>());
-                financeList = this.fianceListArray.get(this.fianceListArray.size() - 1);
-            }
-            financeList.add(f);
-            lastDate = f.date;
-        }
-        if(!financeList.isEmpty()){
-            this.financeAdapterList.add(new FinanceAdapter(financeList, DateTimeTrans.getMonthDay2String(lastDate), MainActivity.this, R.layout.listview_finance));
-        }
-    }
-
-    public void reflushListViewData() {
-        if(this.CRU_SELECT_ACTIVITY == CRU_SELECT_ACTIVITY_FRANCE) {
-            this.listData = Finance.getOneMonthFormDb(this.selectYear, this.selectMonth);
-            this.genFinanceDateList();
-            this.financeDateAdapter = new FinanceDateAdapter(this.financeAdapterList, MainActivity.this, R.layout.listview_date);
-            this.listView.setAdapter(financeDateAdapter);
-            if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_MODIFY) {
-                this.resetPopListSelect();
-            }
-            setListViewHeightBasedOnChildren(this.listView);
-
-            this.textMonth.setText(String.format("%d年%02d月", this.selectYear, this.selectMonth));
-            this.textTotalAmount.setText(String.format("%.2f", this.tatalAmount));
-        }else {
-            FatAdapter.setListViewAdapter(this.selectYear, this.selectMonth, MainActivity.this, this.listView, R.layout.listview_fat);
-            this.textTotalAmount.setText(String.format("%.2f", 0.0));
-        }
-
-    }
-
-    // 解决listview 只能显示一条记录的问题
-    public static void setListViewHeightBasedOnChildren(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) {
-            return;
-        }
-
-        int totalHeight = 0;
-        for (int i = 0, len = listAdapter.getCount(); i < len; i++) { // listAdapter.getCount()返回数据项的数目
-            View listItem = listAdapter.getView(i, null, listView);
-            listItem.measure(0, 0); // 计算子项View 的宽高
-            totalHeight += listItem.getMeasuredHeight(); // 统计所有子项的总高度
-        }
-
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
-    }
 
 
-    /* pop list */
-    private void initPopListView() {
-        this.popListView = new ListView(MainActivity.this);
-        this.popListView.setDivider(null);
-        this.popListView.setVerticalScrollBarEnabled(false);
-        this.popListView.setAdapter(new PopListViewAdapter(popListData, MainActivity.this, R.layout.poplistview_item));
-        this.popListView.setBackgroundResource(R.drawable.textview_border);
 
-        popWin = new PopupWindow(MainActivity.this);
-        popWin.setWidth(300);//设置宽度 和编辑框的宽度相同
-        popWin.setHeight(180);
-        popWin.setContentView(popListView);
-        popWin.setOutsideTouchable(true);
-
-        popWin.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                if(MainActivity.selectListViewFinanceId == INVALID_LIST_VIEW_ITEM_ID){
-                    return;
-                }
-                if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_INVALID) {
-                    MainActivity.selectListViewFinanceId = INVALID_LIST_VIEW_ITEM_ID;
-                    return;
-                }
-                if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_DEL) {
-                    MainActivity.this.showDeleteAlertDialog("删除记账！");
-                }else {
-                    startActivity(CreateActivity.class);
-                }
-            }
-        });
-    }
 
     public void startActivity(Class c) {
         Intent intent = new Intent(MainActivity.this, c);
         startActivityForResult(intent, REQUEST);
-    }
-
-    private void resetPopListSelect() {
-        MainActivity.selectListViewFinanceId = INVALID_LIST_VIEW_ITEM_ID;
-        PopListViewAdapter.selectCmd = PopListViewAdapter.CMD_INVALID;
-        PopWin.resetPopListSelect();
-    }
-
-    public void showDeleteAlertDialog(String title){
-        new AlertDialog.Builder(MainActivity.this)
-                .setTitle(title)
-                .setIcon(android.R.drawable.ic_delete)
-                .setMessage("确定吗")
-                .setPositiveButton("是", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        if(MainActivity.this.CRU_SELECT_ACTIVITY == CRU_SELECT_ACTIVITY_FRANCE) {
-                            Finance.deleteFromDb(MainActivity.selectListViewFinanceId);
-                        }else {
-                            Fat.deleteFromDb(PopWin.selectListViewId);
-                        }
-
-                        MainActivity.this.reflushListViewData();
-                        MainActivity.this.resetPopListSelect();
-
-                    }
-                })
-                .setNegativeButton("否", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        MainActivity.this.resetPopListSelect();
-                    }
-                })
-                .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialogInterface) {
-                        MainActivity.this.resetPopListSelect();
-                    }
-                })
-                .show();
     }
 
 
@@ -611,39 +395,7 @@ public class MainActivity extends AppCompatActivity {
     };
     }
 
-    public void btn_create(View view) {
-        if(this.CRU_SELECT_ACTIVITY == CRU_SELECT_ACTIVITY_FRANCE) {
-            Intent intent = new Intent(MainActivity.this, CreateActivity.class);
-            startActivityForResult(intent, REQUEST);
-        }else {
-            Intent intent = new Intent(MainActivity.this, FatCreateActivity.class);
-            startActivityForResult(intent, REQUEST);
-        }
 
-    }
 
-    private void modifyListViewShowMonth(int monthAdd) {
-        this.selectMonth += monthAdd;
-        while(this.selectMonth <= 0) {
-            this.selectMonth += 12;
-            this.selectYear --;
-        }
-        if(this.selectMonth == 12) return;
-        this.selectYear += (this.selectMonth / 12);
-        this.selectMonth = (this.selectMonth % 12);
-    }
-
-    public void btn_dateChange(View view) {
-        TextView btn = (TextView)view;
-        int a = btn.getId();
-        if(btn.getId() == R.id.bt_left) {
-            modifyListViewShowMonth(-1);
-        }else if(btn.getId() == R.id.bt_right) {
-            modifyListViewShowMonth(1);
-        }else {
-            this.initSelectYearMonth();
-        }
-        this.reflushListViewData();
-    }
 
 }

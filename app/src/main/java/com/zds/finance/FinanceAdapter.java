@@ -18,8 +18,8 @@ public class FinanceAdapter extends ArrayAdapter<Finance> {
     private AdapterView.OnItemLongClickListener itemLongClickListener = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-            MainActivity.selectListViewFinanceId = Integer.parseInt(((TextView) view.findViewById(R.id.txtfinance_id)).getText().toString());
-            MainActivity.popWin.showAsDropDown(view, 300, -10);
+            FinanceList.selectListViewFinanceId = Integer.parseInt(((TextView) view.findViewById(R.id.txtfinance_id)).getText().toString());
+            FinanceList.popWin.showAsDropDown(view, 300, -10);
             return false;
         }
     };
@@ -41,7 +41,7 @@ public class FinanceAdapter extends ArrayAdapter<Finance> {
         txtVeiwDate_.setText(this.date);
         listFinance_.setAdapter(this);
         listFinance_.setOnItemLongClickListener(this.itemLongClickListener);
-        MainActivity.setListViewHeightBasedOnChildren(listFinance_);
+        FinanceList.setListViewHeightBasedOnChildren(listFinance_);
     }
 
     @Override
