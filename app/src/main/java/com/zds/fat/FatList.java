@@ -33,7 +33,7 @@ public class FatList {
 
 
 
-    public void setFatListView() {
+    public void setView() {
         this.viewFatList = LayoutInflater.from(this.context).inflate(R.layout.view_fatlist, null);
         LinearLayout linearLayout = ((AppCompatActivity)context).findViewById(R.id.layout_fiance);
         linearLayout.removeAllViews();

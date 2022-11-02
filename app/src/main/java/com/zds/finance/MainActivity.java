@@ -22,6 +22,7 @@ import com.zds.common.FileRWThread;
 import com.zds.common.FtpFile;
 import com.zds.common.HandlerMsgId;
 import com.zds.fat.FatList;
+import com.zds.fat.FatStats;
 import com.zds.finance.databinding.ActivityMainBinding;
 
 import java.io.File;
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private FinanceStats financeStats;
 
     private FatList fatList;
+    private FatStats fatStats;
 
 
 
@@ -159,9 +161,9 @@ public class MainActivity extends AppCompatActivity {
 
     void setLayoutContainer() {
         if(this.CRU_SELECT_ACTIVITY == CRU_SELECT_ACTIVITY_FRANCE) {
-            this.financeList.setFianceListView();
+            this.financeList.setView();
         }else {
-            this.fatList.setFatListView();
+            this.fatList.setView();
         }
     }
 
@@ -219,18 +221,27 @@ public class MainActivity extends AppCompatActivity {
         this.financeList = new FinanceList(this);
         this.financeStats = new FinanceStats(this);
         this.fatList = new FatList(this);
-        this.financeList.setFianceListView();
+        this.fatStats = new FatStats(this);
+        this.financeList.setView();
 
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                if(tab.getPosition() == 0) {
-                    MainActivity.this.financeList.setFianceListView();
+                if(MainActivity.this.CRU_SELECT_ACTIVITY == CRU_SELECT_ACTIVITY_FRANCE) {
+                    if(tab.getPosition() == 0) {
+                        MainActivity.this.financeList.setView();
+                    }else {
+                        MainActivity.this.financeStats.setView();
+                    }
                 }else {
-                    new FinanceStats(MainActivity.this);
-                    MainActivity.this.financeStats.setFianceStatsView();
+                    if(tab.getPosition() == 0) {
+                        MainActivity.this.fatList.setView();
+                    }else {
+                        MainActivity.this.fatStats.setView();
+                    }
                 }
+
             }
 
             @Override

@@ -28,8 +28,8 @@ public class FinanceList {
         this.context = context_;
     }
 
-    public void setFianceListView() {
-        this.viewFinanceList = LayoutInflater.from(this.context).inflate(R.layout.view_fiancelist, null);
+    public void setView() {
+        this.viewFinanceList = LayoutInflater.from(this.context).inflate(R.layout.view_financelist, null);
         LinearLayout linearLayout = ((AppCompatActivity)context).findViewById(R.id.layout_fiance);
         linearLayout.removeAllViews();
         linearLayout.addView(this.viewFinanceList);

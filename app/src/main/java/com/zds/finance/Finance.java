@@ -143,6 +143,25 @@ public class Finance {
         return allFinances.get(0);
     }
 
+    public static List<Finance> getTypeInOneYearFormDb(int year, String type) {
+        String dataStartStr = String.format("%d年%02d月%02d日", year, 1, 1);  //yyyy年MM月dd日
+        String dataEndStr = String.format("%d年%02d月%02d日", year + 1, 1, 1);  //yyyy年MM月dd日
+        long dataStart = DateTimeTrans.getString2Date(dataStartStr);
+        long dataEnd = DateTimeTrans.getString2Date(dataEndStr);
+        List<Finance> allFinances = new ArrayList<Finance>();
+        Cursor cursor = DataBaseHelper.getDb().rawQuery("select " + selectColName + " from finance where type = ? and date >= " +
+                dataStart + " and date < " + dataEnd + " order by date", new String[]{type});
+        if(cursor == null) {
+            return allFinances;
+        }
+        while(cursor.moveToNext()) {
+            Finance finance = new Finance(cursor.getInt(0), cursor.getString(1),
+                    cursor.getLong(2), cursor.getFloat(3), cursor.getString(4));
+            allFinances.add(finance);
+        }
+        return allFinances;
+    }
+
     public static List<Finance> getPeriodFormDb(int beginYear, int beginMonth, int endYear, int endMonth) {
         String dataStartStr = String.format("%d年%02d月%02d日", beginYear, beginMonth, 1);  //yyyy年MM月dd日
         String dataEndStr = String.format("%d年%02d月%02d日", endYear, endMonth, 1);  //yyyy年MM月dd日

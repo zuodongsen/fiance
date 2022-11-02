@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -24,6 +25,12 @@ public class PieChart extends View {
 
     public float pieValueSum;
 
+    float centerPointX;
+    float centerPointY;
+    float radius;
+
+    final float arcRate = (float) (3.14 / 180);
+
     public PieChart(Context context) {
         super(context);
     }
@@ -38,6 +45,46 @@ public class PieChart extends View {
         genaratePidAngle();
 
     }
+
+    public PieData getDataByPoint(float x, float y) {
+        if(Math.pow(x - this.centerPointX, 2) + Math.pow(y - this.centerPointY, 2) > Math.pow(this.radius, 2)) {
+            return null;
+        }
+        float angle = this.getAngleByPoint(x, y);
+        return this.getDataByAngle(angle);
+    }
+
+    private float getAngleByPoint(float x, float y) {
+        if(x == this.centerPointX) {
+            return (y > this.centerPointY ? 90 : 270);
+        }
+        float angle = (float) Math.atan((y - this.centerPointX) / (x - this.centerPointX)) / arcRate;
+
+        if(y >= this.centerPointY) {
+            if(x < this.centerPointX) {
+                return angle + 180;
+            }else {
+                return angle;
+            }
+        }else {
+            if(x < this.centerPointX) {
+                return angle + 180;
+            }else {
+                return angle + 360;
+            }
+        }
+    }
+
+    private PieData getDataByAngle(float angle) {
+        for(PieData d : this.data) {
+            if(d.pieAngleStart < angle && angle - d.pieAngleStart <= d.pieAngleSwap) {
+                return d;
+            }
+        }
+        return null;
+    }
+
+
 
     private float calcValueSun() {
         float rst = 0;
@@ -64,12 +111,11 @@ public class PieChart extends View {
         for(int loop = 1; loop < data.size();) {
             System.out.println(data.get(loop).pieValue);
             if(data.get(loop).pieValue / this.pieValueSum < 0.01) {
+                data.get(0).pieStringPoly.add(data.get(loop).pieString);
                 if(loop == 1)
                     data.get(0).pieString = "杂项";
                 data.get(0).pieValue += data.get(loop).pieValue;
                 data.remove(loop);
-
-
             }else
                 break;
         }
@@ -100,9 +146,9 @@ public class PieChart extends View {
     }
 
     private void genarateLinePoint(float standardX, float standardY, float radius, float width, int textHeight) {
-        float centerPointX = standardX + width / 2;
-        float centerPointY = standardY + width / 2;
-        float arcRate = (float) (3.14 / 180);
+        this.centerPointX = standardX + width / 2;
+        this.centerPointY = standardY + width / 2;
+
         float lineLength = 100;
 
         for (PieData it: data) {
@@ -141,9 +187,7 @@ public class PieChart extends View {
      */
     @Override
     public void onDraw(Canvas canvas) {
-
         int leftForText = 250;
-        float radius = 0;
         float lineLength = 100;
         super.onDraw(canvas);
         Paint paint = new Paint();
@@ -160,7 +204,7 @@ public class PieChart extends View {
         int height = rect.height();
 
         float x = getMeasuredWidth();
-        radius = x / 2 - leftForText;
+        this.radius = x / 2 - leftForText;
         float centerPointX = x / 2;
         float centerPointY = x / 2;
 
