@@ -67,7 +67,8 @@ public class FinanceStats {
                 continue;
             }
             if(!financeList.isEmpty()){
-                this.financeAdapterList.add(new FinanceAdapter(financeList, DateTimeTrans.getMonthDay2String(lastDate), this.context, R.layout.listview_finance));
+                this.financeAdapterList.add(new FinanceAdapter(financeList, DateTimeTrans.getMonthDay2String(lastDate),
+                        this.context, R.layout.listview_finance,false));
                 this.fianceListArray.add(new ArrayList<>());
                 financeList = this.fianceListArray.get(this.fianceListArray.size() - 1);
             }
@@ -75,7 +76,8 @@ public class FinanceStats {
             lastDate = f.date;
         }
         if(!financeList.isEmpty()){
-            this.financeAdapterList.add(new FinanceAdapter(financeList, DateTimeTrans.getMonthDay2String(lastDate), this.context, R.layout.listview_finance));
+            this.financeAdapterList.add(new FinanceAdapter(financeList, DateTimeTrans.getMonthDay2String(lastDate),
+                    this.context, R.layout.listview_finance,false));
         }
     }
 
@@ -93,7 +95,7 @@ public class FinanceStats {
         TextView txtStatsType = this.viewfFinanceStats.findViewById(R.id.txtstats_type);
         listView.setAdapter(this.financeDateAdapter);
         FinanceList.setListViewHeightBasedOnChildren(listView);
-        txtStatsType.setText("  " + this.selectType + "共消费 " + this.listData.size() + " 次，共 " + this.selectPieData.pieStringDown + " 元");
+        txtStatsType.setText("  " + this.selectType + "消费 " + this.listData.size() + " 次，共 " + this.selectPieData.pieStringDown + " 元");
 
     }
 
@@ -124,7 +126,7 @@ public class FinanceStats {
         layoutMonth.addView(pieChart);
         this.selectType = pieDataList.get(0).pieString;
         this.selectPieData = pieDataList.get(0);
-        txtYear.setText(String.valueOf(this.selectYear) + "年 共消费RMB：" + String.valueOf(pieChart.pieValueSum));
+        txtYear.setText("  " + String.valueOf(this.selectYear) + "年 共消费RMB：" + String.valueOf(pieChart.pieValueSum));
     }
 
 

@@ -42,8 +42,8 @@ public class CreateActivity extends AppCompatActivity {
         this.txtAmount = (TextView)findViewById(R.id.textedit_amount);
         this.calendar = Calendar.getInstance();
         initSpinnerType();
-        if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_MODIFY) {
-            Finance finance = Finance.getOneFormDb(MainActivity.selectListViewFinanceId);
+        if(FinanceListPopAdapter.selectCmd == FinanceListPopAdapter.CMD_MODIFY) {
+            Finance finance = Finance.getOneFormDb(FinanceList.selectListViewFinanceId);
             this.txtDate.setText(finance.getDate2String());
             this.txtInfo.setText(finance.info);
             this.txtAmount.setText(String.valueOf(finance.amount));
@@ -115,8 +115,8 @@ public class CreateActivity extends AppCompatActivity {
                 this.txtDate.getText().toString(),
                 amount_,
                 this.spnType.getSelectedItem().toString());
-        if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_MODIFY) {
-            Finance.updateToDb(MainActivity.selectListViewFinanceId, finance);
+        if(FinanceListPopAdapter.selectCmd == FinanceListPopAdapter.CMD_MODIFY) {
+            Finance.updateToDb(FinanceList.selectListViewFinanceId, finance);
         }else {
             Finance.insertToDb(finance);
         }

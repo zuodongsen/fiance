@@ -96,7 +96,7 @@ public class Fat {
             Fat fat = new Fat(cursor.getInt(0), cursor.getLong(1),
                     cursor.getFloat(2), cursor.getFloat(3),
                     cursor.getFloat(4), cursor.getInt(5),
-                    cursor.getInt(5));
+                    cursor.getInt(6));
             fats.add(fat);
         }
         return fats.get(0);

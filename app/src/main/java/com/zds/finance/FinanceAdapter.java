@@ -15,6 +15,7 @@ public class FinanceAdapter extends ArrayAdapter<Finance> {
     private String date;
     private int listViewResId;
     private boolean isDateParent;
+    private boolean canBeModify;
     private AdapterView.OnItemLongClickListener itemLongClickListener = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -24,11 +25,12 @@ public class FinanceAdapter extends ArrayAdapter<Finance> {
         }
     };
 
-    public FinanceAdapter(List<Finance> listData_, String date_, Context context_, int txtViewResId_) {
+    public FinanceAdapter(List<Finance> listData_, String date_, Context context_, int txtViewResId_, Boolean canBeModify_) {
         super(context_, txtViewResId_, listData_);
         this.listViewResId = txtViewResId_;
         this.date = date_;
         this.isDateParent = true;
+        this.canBeModify = canBeModify_;
     }
 
     public FinanceAdapter(List<Finance> listData_, Context context_, int txtViewResId_) {
@@ -40,7 +42,9 @@ public class FinanceAdapter extends ArrayAdapter<Finance> {
     public void setHolder(TextView txtVeiwDate_, ListView listFinance_) {
         txtVeiwDate_.setText(this.date);
         listFinance_.setAdapter(this);
-        listFinance_.setOnItemLongClickListener(this.itemLongClickListener);
+        if(this.canBeModify) {
+            listFinance_.setOnItemLongClickListener(this.itemLongClickListener);
+        }
         FinanceList.setListViewHeightBasedOnChildren(listFinance_);
     }
 

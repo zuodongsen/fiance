@@ -44,10 +44,11 @@ public class MainActivity extends AppCompatActivity {
 
     private final int CRU_SELECT_ACTIVITY_FRANCE = 0;
     private final int CRU_SELECT_ACTIVITY_FAT = 1;
+    private final int CRU_SELECT_TAB_LIST = 0;
+    private final int CRU_SELECT_TAB_STATS = 1;
     private int CRU_SELECT_ACTIVITY = CRU_SELECT_ACTIVITY_FRANCE;
+    private int CRU_SELECT_TAB = CRU_SELECT_TAB_LIST;
 
-    static PopupWindow popWin;
-    static int selectListViewFinanceId;
     static int selectFileIndexForInput;
     static int selectFileIndexForUpload;
     static int selectFileIndexForRemoteInput;
@@ -161,9 +162,17 @@ public class MainActivity extends AppCompatActivity {
 
     void setLayoutContainer() {
         if(this.CRU_SELECT_ACTIVITY == CRU_SELECT_ACTIVITY_FRANCE) {
-            this.financeList.setView();
+            if(this.CRU_SELECT_TAB == this.CRU_SELECT_TAB_LIST) {
+                this.financeList.setView();
+            }else {
+                this.financeStats.setView();
+            }
         }else {
-            this.fatList.setView();
+            if(this.CRU_SELECT_TAB == this.CRU_SELECT_TAB_LIST) {
+                this.fatList.setView();
+            }else {
+                this.fatStats.setView();
+            }
         }
     }
 
@@ -228,19 +237,12 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                if(MainActivity.this.CRU_SELECT_ACTIVITY == CRU_SELECT_ACTIVITY_FRANCE) {
-                    if(tab.getPosition() == 0) {
-                        MainActivity.this.financeList.setView();
-                    }else {
-                        MainActivity.this.financeStats.setView();
-                    }
+                if(tab.getPosition() == 0) {
+                    MainActivity.this.CRU_SELECT_TAB = MainActivity.this.CRU_SELECT_TAB_LIST;
                 }else {
-                    if(tab.getPosition() == 0) {
-                        MainActivity.this.fatList.setView();
-                    }else {
-                        MainActivity.this.fatStats.setView();
-                    }
+                    MainActivity.this.CRU_SELECT_TAB = MainActivity.this.CRU_SELECT_TAB_STATS;
                 }
+                MainActivity.this.setLayoutContainer();
 
             }
 

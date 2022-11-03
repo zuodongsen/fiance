@@ -18,7 +18,7 @@ import com.zds.common.DataBaseHelper;
 import com.zds.finance.CreateActivity;
 import com.zds.finance.FinanceList;
 import com.zds.finance.FinanceListPopAdapter;
-import com.zds.finance.PopListViewAdapter;
+//import com.zds.fat.PopWinAdapter.PopListViewAdapter;
 import com.zds.finance.R;
 
 import java.util.ArrayList;
@@ -98,7 +98,7 @@ public class FatList {
         this.popListView = new ListView(this.context);
         this.popListView.setDivider(null);
         this.popListView.setVerticalScrollBarEnabled(false);
-        this.popListView.setAdapter(new FinanceListPopAdapter(this.context, R.layout.poplistview_item));
+        this.popListView.setAdapter(new FatListPopAdapter(this.context, R.layout.poplistview_item));
         this.popListView.setBackgroundResource(R.drawable.textview_border);
 
         popWin = new PopupWindow(this.context);
@@ -111,26 +111,25 @@ public class FatList {
             @Override
             public void onDismiss() {
                 System.out.println("onDismiss");
-                if(FatList.selectListViewFinanceId == INVALID_LIST_VIEW_ITEM_ID){
+                if(FatList.selectListViewItemId == INVALID_LIST_VIEW_ITEM_ID){
                     return;
                 }
-                if(FatListPopAdapter.selectCmd == PopListViewAdapter.CMD_INVALID) {
-                    FatList.selectListViewFinanceId = INVALID_LIST_VIEW_ITEM_ID;
+                if(FatListPopAdapter.selectCmd == FatListPopAdapter.CMD_INVALID) {
+                    FatList.selectListViewItemId = INVALID_LIST_VIEW_ITEM_ID;
                     return;
                 }
-                if(FatListPopAdapter.selectCmd == PopListViewAdapter.CMD_DEL) {
-                    FatList.this.showDeleteAlertDialog("删除记账！");
+                if(FatListPopAdapter.selectCmd == FatListPopAdapter.CMD_DEL) {
+                    FatList.this.showDeleteAlertDialog("删除记录！");
                 }else {
-                    startActivity(CreateActivity.class);
+                    startActivity(FatCreateActivity.class);
                 }
             }
         });
     }
 
     private void resetPopListSelect() {
-        FatList.selectListViewFinanceId = INVALID_LIST_VIEW_ITEM_ID;
+        FatList.selectListViewItemId = INVALID_LIST_VIEW_ITEM_ID;
         FatListPopAdapter.selectCmd = FatListPopAdapter.CMD_INVALID;
-        PopWin.resetPopListSelect();
     }
 
     private void reflushListViewData() {
@@ -149,7 +148,7 @@ public class FatList {
                 .setPositiveButton("是", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Fat.deleteFromDb(PopWin.selectListViewId);
+                        Fat.deleteFromDb(FatList.selectListViewItemId);
                         FatList.this.reflushListViewData();
                         FatList.this.resetPopListSelect();
                     }
@@ -225,7 +224,7 @@ public class FatList {
     private TextView textMonth;
     private TextView textTotalAmount;
 
-    static int selectListViewFinanceId;
+    static int selectListViewItemId;
 
     static PopupWindow popWin;
     final static int REQUEST=10;

@@ -4,18 +4,15 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import com.zds.finance.Finance;
-import com.zds.finance.FinanceAdapter;
-import com.zds.finance.MainActivity;
 import com.zds.finance.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class FatAdapter extends ArrayAdapter<Fat> {
@@ -29,9 +26,16 @@ public class FatAdapter extends ArrayAdapter<Fat> {
         fatList = Fat.getOneMonthFormDb(year, month);
         fatAdapter = new FatAdapter(fatList, context_, txtViewResId_);
         listView.setAdapter(fatAdapter);
-//        PopWin.initPopListView(context_);
-        listView.setOnItemLongClickListener(PopWin.itemLongClickListener);
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                FatList.selectListViewItemId = Integer.parseInt(((TextView) view.findViewById(R.id.textfat_id)).getText().toString());
+                FatList.popWin.showAsDropDown(view, 300, -10);
+                return false;
+            }
+        });
     }
+
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {

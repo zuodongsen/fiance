@@ -36,6 +36,7 @@ public class FinanceListPopAdapter extends ArrayAdapter<String> {
                 if(btn.getText() == "删除") {
                     FinanceListPopAdapter.selectCmd = CMD_DEL;
                 }else {
+                    System.out.println("修改");
                     FinanceListPopAdapter.selectCmd = CMD_MODIFY;
                 }
                 int a = btn.getId();

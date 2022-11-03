@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.zds.common.DataBaseHelper;
 import com.zds.common.DateTimeTrans;
+import com.zds.fat.FatListPopAdapter;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,15 +27,16 @@ import java.util.List;
 public class FinanceList {
     public FinanceList(Context context_) {
         this.context = context_;
+        this.viewFinanceList = LayoutInflater.from(this.context).inflate(R.layout.view_financelist, null);
+        financeLinearLayout = ((AppCompatActivity)context).findViewById(R.id.layout_fiance);
+        this.initFinanceList();
+        this.initBtn();
     }
 
     public void setView() {
-        this.viewFinanceList = LayoutInflater.from(this.context).inflate(R.layout.view_financelist, null);
-        LinearLayout linearLayout = ((AppCompatActivity)context).findViewById(R.id.layout_fiance);
-        linearLayout.removeAllViews();
-        linearLayout.addView(this.viewFinanceList);
-        this.initFinanceList();
-        this.initBtn();
+        financeLinearLayout.removeAllViews();
+        financeLinearLayout.addView(this.viewFinanceList);
+        this.reflushListViewData();
     }
 
     private void initFinanceList() {
@@ -106,15 +108,14 @@ public class FinanceList {
         popWin.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
-                System.out.println("onDismiss");
                 if(FinanceList.selectListViewFinanceId == INVALID_LIST_VIEW_ITEM_ID){
                     return;
                 }
-                if(FinanceListPopAdapter.selectCmd == PopListViewAdapter.CMD_INVALID) {
+                if(FinanceListPopAdapter.selectCmd == FinanceListPopAdapter.CMD_INVALID) {
                     FinanceList.selectListViewFinanceId = INVALID_LIST_VIEW_ITEM_ID;
                     return;
                 }
-                if(FinanceListPopAdapter.selectCmd == PopListViewAdapter.CMD_DEL) {
+                if(FinanceListPopAdapter.selectCmd == FinanceListPopAdapter.CMD_DEL) {
                     FinanceList.this.showDeleteAlertDialog("删除记账！");
                 }else {
                     startActivity(CreateActivity.class);
@@ -164,7 +165,7 @@ public class FinanceList {
         this.genFinanceDateList();
         this.financeDateAdapter = new FinanceDateAdapter(this.financeAdapterList, this.context, R.layout.listview_date);
         this.listView.setAdapter(financeDateAdapter);
-        if(PopListViewAdapter.selectCmd == PopListViewAdapter.CMD_MODIFY) {
+        if(FinanceListPopAdapter.selectCmd == FinanceListPopAdapter.CMD_MODIFY) {
             this.resetPopListSelect();
         }
         setListViewHeightBasedOnChildren(this.listView);
@@ -205,7 +206,7 @@ public class FinanceList {
                 continue;
             }
             if(!financeList.isEmpty()){
-                this.financeAdapterList.add(new FinanceAdapter(financeList, DateTimeTrans.getMonthDay2String(lastDate), this.context, R.layout.listview_finance));
+                this.financeAdapterList.add(new FinanceAdapter(financeList, DateTimeTrans.getMonthDay2String(lastDate), this.context, R.layout.listview_finance, true));
                 this.fianceListArray.add(new ArrayList<>());
                 financeList = this.fianceListArray.get(this.fianceListArray.size() - 1);
             }
@@ -213,7 +214,7 @@ public class FinanceList {
             lastDate = f.date;
         }
         if(!financeList.isEmpty()){
-            this.financeAdapterList.add(new FinanceAdapter(financeList, DateTimeTrans.getMonthDay2String(lastDate), this.context, R.layout.listview_finance));
+            this.financeAdapterList.add(new FinanceAdapter(financeList, DateTimeTrans.getMonthDay2String(lastDate), this.context, R.layout.listview_finance, true));
         }
     }
 
@@ -268,6 +269,7 @@ public class FinanceList {
     private List<FinanceAdapter> financeAdapterList = new ArrayList<>();
     private FinanceDateAdapter financeDateAdapter;
     private Context context;
+    LinearLayout financeLinearLayout;
     private View viewFinanceList;
 
     private ListView listView;

@@ -11,10 +11,10 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.zds.common.DateTimeTrans;
-import com.zds.finance.CreateActivity;
-import com.zds.finance.Finance;
-import com.zds.finance.MainActivity;
-import com.zds.finance.PopListViewAdapter;
+//import com.zds.finance.CreateActivity;
+//import com.zds.finance.Finance;
+//import com.zds.finance.MainActivity;
+//import com.zds.fat.PopWinAdapter.PopListViewAdapter;
 import com.zds.finance.R;
 
 import java.util.Calendar;
@@ -30,8 +30,8 @@ public class FatCreateActivity extends AppCompatActivity {
         this.txtNight = (TextView)findViewById(R.id.texteditcreatefat_night);
         this.txtRope = (TextView)findViewById(R.id.texteditcreatefat_rope);
         this.txtCircle = (TextView)findViewById(R.id.texteditcreatefat_cricle);
-        if(PopWinAdapter.selectCmd == PopWinAdapter.CMD_MODIFY) {
-            Fat fat = Fat.getOneFormDb(PopWin.selectListViewId);
+        if(FatListPopAdapter.selectCmd == FatListPopAdapter.CMD_MODIFY) {
+            Fat fat = Fat.getOneFormDb(FatList.selectListViewItemId);
             this.txtDate.setText(DateTimeTrans.getDate2String(fat.date));
             this.txtMorning.setText(String.valueOf(fat.morningWeight));
             this.txtNoon.setText(String.valueOf(fat.noonWeight));
@@ -96,8 +96,8 @@ public class FatCreateActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         Fat fat = new Fat(strDate, morning, noon, night, rope, cricle);
-        if(PopWinAdapter.selectCmd == PopWinAdapter.CMD_MODIFY) {
-            Fat.updateToDb(PopWin.selectListViewId, fat);
+        if(FatListPopAdapter.selectCmd == FatListPopAdapter.CMD_MODIFY) {
+            Fat.updateToDb(FatList.selectListViewItemId, fat);
         }else {
             Fat.insertToDb(fat);
         }
