@@ -200,14 +200,6 @@ public class FatList {
 
     public void btn_create(View view) {
         startActivity(FatCreateActivity.class);
-//        if(this.CRU_SELECT_ACTIVITY == CRU_SELECT_ACTIVITY_FRANCE) {
-//            Intent intent = new Intent(MainActivity.this, CreateActivity.class);
-//            startActivityForResult(intent, REQUEST);
-//        }else {
-//            Intent intent = new Intent(MainActivity.this, FatCreateActivity.class);
-//            startActivityForResult(intent, REQUEST);
-//        }
-
     }
 
     private int selectYear;

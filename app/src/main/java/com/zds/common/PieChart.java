@@ -96,8 +96,6 @@ public class PieChart extends View {
 
     private void genaratePidAngle() {
         this.pieValueSum = this.calcValueSun();
-
-
         data.sort(new Comparator<PieData>() {
             @Override
             public int compare(PieData o1, PieData o2) {
@@ -109,7 +107,6 @@ public class PieChart extends View {
         });
 
         for(int loop = 1; loop < data.size();) {
-            System.out.println(data.get(loop).pieValue);
             if(data.get(loop).pieValue / this.pieValueSum < 0.01) {
                 data.get(0).pieStringPoly.add(data.get(loop).pieString);
                 if(loop == 1)
@@ -132,7 +129,7 @@ public class PieChart extends View {
             it.pieAngleStart = degreeSum;
             it.pieAngleSwap = pieAngle;
             it.pieColor = this.genarateColor();
-            it.pieStringDown = String.valueOf(it.pieValue);
+            it.pieStringDown = String.format("%.1f", it.pieValue);
             degreeSum += pieAngle;
         }
 
@@ -178,7 +175,6 @@ public class PieChart extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
     }
 
     /**
@@ -188,7 +184,6 @@ public class PieChart extends View {
     @Override
     public void onDraw(Canvas canvas) {
         int leftForText = 250;
-        float lineLength = 100;
         super.onDraw(canvas);
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.FILL);
@@ -205,11 +200,8 @@ public class PieChart extends View {
 
         float x = getMeasuredWidth();
         this.radius = x / 2 - leftForText;
-        float centerPointX = x / 2;
-        float centerPointY = x / 2;
 
         RectF oval = new RectF(leftForText, leftForText, getRight() - leftForText,x - leftForText);
-        System.out.println(getRight());
 
         this.genarateLinePoint(0, 0, radius, x, height);
 

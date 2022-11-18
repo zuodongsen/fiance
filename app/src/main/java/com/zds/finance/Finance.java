@@ -53,7 +53,7 @@ public class Finance {
         try {
             JSONObject js = new JSONObject(jsStr);
             this.info = js.getString("info");
-            this.date = js.getLong("date");
+            this.date = DateTimeTrans.getString2Date(js.getString("date"));
             this.amount = new Float(js.getDouble("amount"));
             this.type = js.getString("type");
         } catch (JSONException e) {
@@ -75,7 +75,7 @@ public class Finance {
     public void setHolder(TextView txtVeiwName_, TextView txtViewId_, TextView txtAmound_, TextView txtType_, TextView txtDate_) {
         txtVeiwName_.setText(this.info);
         txtViewId_.setText(String.valueOf(this.id));
-        txtAmound_.setText(String.valueOf(this.amount));
+        txtAmound_.setText(String.format("%.1f", this.amount));
         txtDate_.setVisibility(View.VISIBLE);
         txtType_.setText(this.type);
         txtDate_.setText(this.getDate2String());
@@ -86,7 +86,7 @@ public class Finance {
     }
 
     public String toString() {
-        return String.format("%d, %s, %d, %.2f, %s", this.id, this.info, this.date, this.amount, this.type);
+        return String.format("%d, %s, %d, %.1f, %s", this.id, this.info, this.date, this.amount, this.type);
     }
 
     public String toJson() {
@@ -94,13 +94,22 @@ public class Finance {
         try {
             js.put("id", this.id);
             js.put("type", this.type);
-            js.put("amount", this.amount);
-            js.put("date", this.date);
+            js.put("amount", String.format("%.1f", this.amount));
+            js.put("date", DateTimeTrans.getDate2String(this.date));
             js.put("info", this.info);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return js.toString();
+    }
+
+    public static List<String> getAllToStringList() {
+        List<Finance> allFormDb = Finance.getAllFormDb();
+        List<String> dataInfos = new ArrayList<>();
+        for(Finance it : allFormDb) {
+            dataInfos.add(it.toJson());
+        }
+        return dataInfos;
     }
 
     public static void clearDb() {
@@ -140,12 +149,13 @@ public class Finance {
                     cursor.getLong(2), cursor.getFloat(3), cursor.getString(4));
             allFinances.add(finance);
         }
+        cursor.close();
         return allFinances.get(0);
     }
 
-    public static List<Finance> getTypeInOneYearFormDb(int year, String type) {
-        String dataStartStr = String.format("%d年%02d月%02d日", year, 1, 1);  //yyyy年MM月dd日
-        String dataEndStr = String.format("%d年%02d月%02d日", year + 1, 1, 1);  //yyyy年MM月dd日
+    public static List<Finance> getTypeInYearFormDb(int beginYear, int endYear, String type) {
+        String dataStartStr = String.format("%d年%02d月%02d日", beginYear, 1, 1);  //yyyy年MM月dd日
+        String dataEndStr = String.format("%d年%02d月%02d日", endYear + 1, 1, 1);  //yyyy年MM月dd日
         long dataStart = DateTimeTrans.getString2Date(dataStartStr);
         long dataEnd = DateTimeTrans.getString2Date(dataEndStr);
         List<Finance> allFinances = new ArrayList<Finance>();
@@ -159,6 +169,7 @@ public class Finance {
                     cursor.getLong(2), cursor.getFloat(3), cursor.getString(4));
             allFinances.add(finance);
         }
+        cursor.close();
         return allFinances;
     }
 
@@ -178,6 +189,7 @@ public class Finance {
                     cursor.getLong(2), cursor.getFloat(3), cursor.getString(4));
             allFinances.add(finance);
         }
+        cursor.close();
         return allFinances;
     }
 
@@ -185,8 +197,8 @@ public class Finance {
         return getPeriodFormDb(year, month, year, month + 1);
     }
 
-    public static List<Finance> getOneYearFormDb(int year) {
-        return getPeriodFormDb(year, 1, year + 1, 1);
+    public static List<Finance> getMuiltyYearFormDb(int beginYear, int endYear) {
+        return getPeriodFormDb(beginYear, 1, endYear + 1, 1);
     }
 
     public static float getAmountFromJson(JSONObject js, String key) {
@@ -241,6 +253,7 @@ public class Finance {
                     cursor.getLong(2), cursor.getFloat(3), cursor.getString(4));
             allFinances.add(finance);
         }
+        cursor.close();
         return allFinances;
     }
 

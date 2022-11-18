@@ -236,7 +236,6 @@ public class FinanceList {
     }
 
     public void btn_dateChange(View view) {
-        System.out.println("btn_dateChange");
         TextView btn = (TextView)view;
         int a = btn.getId();
         if(btn.getId() == R.id.bt_left) {

@@ -21,6 +21,7 @@ import com.zds.common.DateTimeTrans;
 import com.zds.common.FileRWThread;
 import com.zds.common.FtpFile;
 import com.zds.common.HandlerMsgId;
+import com.zds.fat.Fat;
 import com.zds.fat.FatList;
 import com.zds.fat.FatStats;
 import com.zds.finance.databinding.ActivityMainBinding;
@@ -33,6 +34,7 @@ import java.util.List;
 /*
 git config --global --unset http.proxy
 git config --global --unset https.proxy
+C:\Users\dosens\AndroidStudioProjects\finance\app\release
 */
 
 
@@ -68,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
     private FatStats fatStats;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,6 +96,21 @@ public class MainActivity extends AppCompatActivity {
         this.setLayoutContainer();
     }
 
+    private void exportToFile() {
+        String fileName;
+        List<String> dataInfos;
+        if(this.CRU_SELECT_ACTIVITY == CRU_SELECT_ACTIVITY_FRANCE) {
+            dataInfos = Finance.getAllToStringList();
+            fileName = "finance_";
+        } else {
+            dataInfos = Fat.getAllToStringList();
+            fileName = "fat_";
+        }
+        FileRWThread csvWriteThread = new FileRWThread(dataInfos, BACKUP_FILE_FOLDER,
+                fileName + DateTimeTrans.getNowDateTime2String() + ".txt", FileRWThread.FILE_RW_TYPE_WRITE);
+        csvWriteThread.run();
+    }
+
     /* menu bar */
 
     private static final int FILE_LIST_TYPE_INPUT = 0;
@@ -105,15 +121,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.menu_export) {
-            List<Finance> allFormDb = Finance.getAllFormDb();
-            List<String> dataInfos = new ArrayList<>();
-            for(Finance it : allFormDb) {
-                dataInfos.add(it.toJson());
-            }
-            FileRWThread csvWriteThread = new FileRWThread(dataInfos, BACKUP_FILE_FOLDER,
-                    "amount_" + DateTimeTrans.getNowDateTime2String() + ".txt", FileRWThread.FILE_RW_TYPE_WRITE);
-            csvWriteThread.run();
-            return true;
+            MainActivity.this.exportToFile();
         }else if(id == R.id.menu_remoteexport) {
             FtpFile ftpList = new FtpFile();
             ftpList.doTypeList();
@@ -233,7 +241,6 @@ public class MainActivity extends AppCompatActivity {
         this.fatStats = new FatStats(this);
         this.financeList.setView();
 
-
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -243,18 +250,11 @@ public class MainActivity extends AppCompatActivity {
                     MainActivity.this.CRU_SELECT_TAB = MainActivity.this.CRU_SELECT_TAB_STATS;
                 }
                 MainActivity.this.setLayoutContainer();
-
             }
-
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
+            public void onTabUnselected(TabLayout.Tab tab) { }
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
+            public void onTabReselected(TabLayout.Tab tab) { }
         });
     }
 
@@ -295,6 +295,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }else if(mode == FILE_LIST_TYPE_REMOTEINPUT){
+            System.out.println(fileList.length);
             builder.setSingleChoiceItems(fileList, -1, new DialogInterface.OnClickListener(){
                 public void onClick(DialogInterface arg0, int arg1) {
                     MainActivity.selectFileIndexForRemoteInput = arg1;
@@ -306,10 +307,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 if(MainActivity.selectFileIndexForInput != INVALID_FILE_SELECT_ID) {
+                    String fileName = MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForInput);
                     FileRWThread csvWriteThread = new FileRWThread(BACKUP_FILE_FOLDER,
-                            MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForInput),
-                            FileRWThread.FILE_RW_TYPE_READ);
-                    csvWriteThread.setFileReadCallBack(Finance::inportToDb);
+                            fileName, FileRWThread.FILE_RW_TYPE_READ);
+                    csvWriteThread.setFileReadCallBack(fileName.contains("finance") ? Finance::inportToDb : Fat::inportToDb);
                     csvWriteThread.run();
                 }else if(!MainActivity.selectFileIndexForDelete.isEmpty()){
                     for(Integer it : MainActivity.selectFileIndexForDelete) {
@@ -358,16 +359,6 @@ public class MainActivity extends AppCompatActivity {
         resetFileListSelect();
     }
 
-
-
-
-
-    public void startActivity(Class c) {
-        Intent intent = new Intent(MainActivity.this, c);
-        startActivityForResult(intent, REQUEST);
-    }
-
-
     /* handler */
     private void initHandler() {
         handler = new Handler() {
@@ -376,9 +367,8 @@ public class MainActivity extends AppCompatActivity {
             switch (msg.what){
                 case HandlerMsgId.FTP_FILE_LIST_RSP: {
                     MainActivity.this.resetFileListSelect();
-                    System.out.println(MainActivity.backupFileNameList.size());
                     String[] fileList = ((String) msg.obj).split(",");
-                    String fileNameTag = "amount";
+                    String fileNameTag = "txt";
                     for(String it : fileList) {
                         System.out.println(it);
                         if(it.indexOf(fileNameTag) >= 0) {
@@ -389,7 +379,7 @@ public class MainActivity extends AppCompatActivity {
                     String[] backupFileNameStrArr = new String[MainActivity.backupFileNameList.size()];
                     MainActivity.backupFileNameList.toArray(backupFileNameStrArr);
                     MainActivity.this.showFileListDialog("下载备份文件", backupFileNameStrArr, FILE_LIST_TYPE_REMOTEINPUT);
-                    System.out.println((String) msg.obj);
+
                     break;
                 }
                 case HandlerMsgId.FTP_FILE_UPLOAD_PROGRESS:

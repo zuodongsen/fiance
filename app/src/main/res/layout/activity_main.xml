@@ -31,10 +31,18 @@
         android:layout_marginBottom="70dp"
         android:orientation="vertical"/>
 
+    <TextView
+        android:id="@+id/text_logInfo"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginTop="-70dp"
+        android:gravity="start|center_vertical"
+        android:textColor="#E66868"
+        android:textSize="12sp" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_marginTop="-70dp"
         android:orientation="horizontal">
 
         <com.google.android.material.tabs.TabLayout
@@ -42,7 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#96CEEA"
+            android:background="@color/golden"
             android:textAlignment="viewEnd">
 
             <com.google.android.material.tabs.TabItem
@@ -58,16 +66,6 @@
         </com.google.android.material.tabs.TabLayout>
 
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/text_logInfo"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:layout_marginTop="0dp"
-        android:background="#28039BE5"
-        android:gravity="start|center_vertical"
-        android:textColor="#E66868"
-        android:textSize="12sp" />
 
 
 </LinearLayout>
