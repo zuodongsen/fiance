@@ -1,6 +1,8 @@
 package com.zds.finance;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -55,6 +58,22 @@ public class FinanceList {
     private void initTextView() {
         this.textMonth = (TextView)this.viewFinanceList.findViewById(R.id.text_month);
         this.textTotalAmount = (TextView)this.viewFinanceList.findViewById(R.id.text_total_amount);
+        this.textMonth.setOnLongClickListener(new View.OnLongClickListener() {
+            @SuppressLint("ResourceType")
+            @Override
+            public boolean onLongClick(View v) {AlertDialog.THEME_HOLO_LIGHT
+                new DatePickerDialog(FinanceList.this.context, 3, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year_, int month_, int dayOfMonth) {
+//                        txtDate.setText(String.format("%d年%02d月%02d日", year_, month_ + 1, dayOfMonth));
+                        selectYear = year_; selectMonth = month_ + 1; //day = dayOfMonth;
+                        FinanceList.this.reflushListViewData();
+                    }
+
+                }, selectYear, selectMonth - 1, 0).show();
+                return false;
+            }
+        });
     }
 
     private void initListView() {
