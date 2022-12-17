@@ -16,10 +16,15 @@ public class FinanceListPopAdapter extends ArrayAdapter<String> {
     public final static int CMD_INVALID = -1;
     public final static int CMD_DEL = 0;
     public final static int CMD_MODIFY = 1;
-    final static List<String> listData = Arrays.asList("删除", "修改");
+    public final static int CMD_TEMPLATE = 2;
+    final static List<String> listData = Arrays.asList("删除", "修改", "模板");
     public FinanceListPopAdapter(Context context, int resource) {
         super(context, resource, listData);
         this.listViewResId = resource;
+        selectCmd = CMD_INVALID;
+    }
+
+    public static void resetSelectCmd() {
         selectCmd = CMD_INVALID;
     }
 
@@ -33,13 +38,14 @@ public class FinanceListPopAdapter extends ArrayAdapter<String> {
             @Override
             public void onClick(View view) {
                 TextView btn = (TextView)view;
-                if(btn.getText() == "删除") {
+                CharSequence btnTxt = btn.getText();
+                if(btnTxt == "删除") {
                     FinanceListPopAdapter.selectCmd = CMD_DEL;
-                }else {
-                    System.out.println("修改");
+                }else if(btnTxt == "修改") {
                     FinanceListPopAdapter.selectCmd = CMD_MODIFY;
+                }else{
+                    FinanceListPopAdapter.selectCmd = CMD_TEMPLATE;
                 }
-                int a = btn.getId();
                 FinanceList.popWin.dismiss();
             }
         });

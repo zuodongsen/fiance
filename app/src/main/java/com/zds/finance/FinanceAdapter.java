@@ -13,6 +13,7 @@ import java.util.List;
 
 public class FinanceAdapter extends ArrayAdapter<Finance> {
     private String date;
+    private float dateAmount;
     private int listViewResId;
     private boolean isDateParent;
     private boolean canBeModify;
@@ -25,10 +26,20 @@ public class FinanceAdapter extends ArrayAdapter<Finance> {
         }
     };
 
-    public FinanceAdapter(List<Finance> listData_, String date_, Context context_, int txtViewResId_, Boolean canBeModify_) {
-        super(context_, txtViewResId_, listData_);
-        this.listViewResId = txtViewResId_;
+    public FinanceAdapter(List<Finance> listData_, String date_, Context context_, int listViewResId_, Boolean canBeModify_) {
+        super(context_, listViewResId_, listData_);
+        this.listViewResId = listViewResId_;
         this.date = date_;
+        this.dateAmount = 0;
+        this.isDateParent = true;
+        this.canBeModify = canBeModify_;
+    }
+
+    public FinanceAdapter(List<Finance> listData_, String date_, float dateAmount_, Context context_, int listViewResId_, Boolean canBeModify_) {
+        super(context_, listViewResId_, listData_);
+        this.listViewResId = listViewResId_;
+        this.date = date_;
+        this.dateAmount = dateAmount_;
         this.isDateParent = true;
         this.canBeModify = canBeModify_;
     }
@@ -39,8 +50,11 @@ public class FinanceAdapter extends ArrayAdapter<Finance> {
         this.isDateParent = false;
     }
 
-    public void setHolder(TextView txtVeiwDate_, ListView listFinance_) {
+    public void setHolder(TextView txtVeiwDate_, TextView txtVeiwAmount_, ListView listFinance_) {
         txtVeiwDate_.setText(this.date);
+        if(this.dateAmount != 0) {
+            txtVeiwAmount_.setText(String.format("%.1f", this.dateAmount));
+        }
         listFinance_.setAdapter(this);
         if(this.canBeModify) {
             listFinance_.setOnItemLongClickListener(this.itemLongClickListener);

@@ -32,6 +32,7 @@ public class FinanceList {
         this.context = context_;
         this.viewFinanceList = LayoutInflater.from(this.context).inflate(R.layout.view_financelist, null);
         financeLinearLayout = ((AppCompatActivity)context).findViewById(R.id.layout_fiance);
+        DataBaseHelper.initDb(this.context);
         this.initFinanceList();
         this.initBtn();
     }
@@ -61,7 +62,7 @@ public class FinanceList {
         this.textMonth.setOnLongClickListener(new View.OnLongClickListener() {
             @SuppressLint("ResourceType")
             @Override
-            public boolean onLongClick(View v) {AlertDialog.THEME_HOLO_LIGHT
+            public boolean onLongClick(View v) {
                 new DatePickerDialog(FinanceList.this.context, 3, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year_, int month_, int dayOfMonth) {
@@ -70,14 +71,13 @@ public class FinanceList {
                         FinanceList.this.reflushListViewData();
                     }
 
-                }, selectYear, selectMonth - 1, 0).show();
+                }, selectYear, selectMonth - 1, 1).show();
                 return false;
             }
         });
     }
 
     private void initListView() {
-        DataBaseHelper.initDb(this.context);
         this.resetPopListSelect();
         this.listView = (ListView)this.viewFinanceList.findViewById(R.id.list_view);
         this.reflushListViewData();
@@ -119,8 +119,8 @@ public class FinanceList {
         this.popListView.setBackgroundResource(R.drawable.textview_border);
 
         popWin = new PopupWindow(this.context);
-        popWin.setWidth(300);//设置宽度 和编辑框的宽度相同
-        popWin.setHeight(180);
+        popWin.setWidth(250);//设置宽度 和编辑框的宽度相同
+        popWin.setHeight(250);
         popWin.setContentView(popListView);
         popWin.setOutsideTouchable(true);
 
@@ -218,22 +218,25 @@ public class FinanceList {
         List<Finance> financeList = this.fianceListArray.get(this.fianceListArray.size() - 1);
         long lastDate = -1;
         this.tatalAmount = 0;
+        float totalDataAmount = 0;
         for (Finance f : this.listData) {
-            this.tatalAmount += f.amount;
             if(lastDate == f.date) {
                 financeList.add(f);
+                totalDataAmount += f.amount;
                 continue;
             }
             if(!financeList.isEmpty()){
-                this.financeAdapterList.add(new FinanceAdapter(financeList, DateTimeTrans.getMonthDay2String(lastDate), this.context, R.layout.listview_finance, true));
+                this.financeAdapterList.add(new FinanceAdapter(financeList, DateTimeTrans.getMonthDay2String(lastDate), totalDataAmount, this.context, R.layout.listview_finance, true));
                 this.fianceListArray.add(new ArrayList<>());
                 financeList = this.fianceListArray.get(this.fianceListArray.size() - 1);
             }
+            this.tatalAmount += totalDataAmount;
+            totalDataAmount = f.amount;
             financeList.add(f);
             lastDate = f.date;
         }
         if(!financeList.isEmpty()){
-            this.financeAdapterList.add(new FinanceAdapter(financeList, DateTimeTrans.getMonthDay2String(lastDate), this.context, R.layout.listview_finance, true));
+            this.financeAdapterList.add(new FinanceAdapter(financeList, DateTimeTrans.getMonthDay2String(lastDate), totalDataAmount, this.context, R.layout.listview_finance, true));
         }
     }
 

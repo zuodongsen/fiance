@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuBuilder;
 
 import android.os.Handler;
 import android.os.Message;
@@ -27,6 +28,7 @@ import com.zds.fat.FatStats;
 import com.zds.finance.databinding.ActivityMainBinding;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         this.setLayoutContainer();
+        FinanceListPopAdapter.resetSelectCmd();
     }
 
     private void exportToFile() {
@@ -117,6 +120,23 @@ public class MainActivity extends AppCompatActivity {
     private static final int FILE_LIST_TYPE_DELETE = 1;
     private static final int FILE_LIST_TYPE_UPLOAD = 2;
     private static final int FILE_LIST_TYPE_REMOTEINPUT = 3;
+
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (menu != null) {
+            if (menu.getClass() == MenuBuilder.class) {
+                try {
+                    Method method = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+                    method.setAccessible(true);
+                    method.invoke(menu, true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return super.onMenuOpened(featureId, menu);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -349,6 +369,7 @@ public class MainActivity extends AppCompatActivity {
         MainActivity.selectFileIndexForUpload = INVALID_FILE_SELECT_ID;
         MainActivity.selectFileIndexForInput = INVALID_FILE_SELECT_ID;
         MainActivity.selectFileIndexForRemoteInput = INVALID_FILE_SELECT_ID;
+        FinanceListPopAdapter.resetSelectCmd();
         MainActivity.selectFileIndexForDelete.clear();
         MainActivity.backupFileNameList.clear();
     }

@@ -26,6 +26,7 @@ public class FinanceDateAdapter extends ArrayAdapter<FinanceAdapter> {
         view = LayoutInflater.from(getContext()).inflate(this.listViewResId,null);
         financeList.setHolder(
                 (TextView)view.findViewById(R.id.txtdate_date),
+                (TextView)view.findViewById(R.id.txtdate_total),
                 (ListView)view.findViewById(R.id.listdate_finance));
         return view;
     }

@@ -11,6 +11,7 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+
         <!-- Customize your theme here. -->
     </style>
 
@@ -19,7 +20,9 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.Finance.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.Finance.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:listPreferredItemHeightSmall" >@dimen/cardview_compat_inset_shadow</item>
+    </style>
 
     <style name="Theme.Finance.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

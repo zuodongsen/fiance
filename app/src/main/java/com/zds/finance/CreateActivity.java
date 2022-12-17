@@ -17,6 +17,7 @@ import com.zds.common.DateTimeTrans;
 import java.util.Calendar;
 
 public class CreateActivity extends AppCompatActivity {
+    private TextView txtTitle;
     private TextView txtDate;
     private TextView txtInfo;
     private TextView txtAmount;
@@ -24,7 +25,7 @@ public class CreateActivity extends AppCompatActivity {
     public static final String[] amountType = new String[] {
             "买菜", "水果", "话费", "水费", "电费",
             "保险", "交通", "养车", "服装", "长辈",
-            "居家", "养娃", "书籍", "电子", "理财",
+            "居家", "娃煜", "书籍", "电子", "理财",
             "餐饮", "购物", "旅游", "医疗", "孕期",
             "潇洒", "其他"};
 
@@ -37,12 +38,14 @@ public class CreateActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
+        this.txtTitle = (TextView)findViewById(R.id.text_title);
         this.txtDate = (TextView)findViewById(R.id.textedit_date);
         this.txtInfo = (TextView)findViewById(R.id.textedit_info);
         this.txtAmount = (TextView)findViewById(R.id.textedit_amount);
         this.calendar = Calendar.getInstance();
         initSpinnerType();
-        if(FinanceListPopAdapter.selectCmd == FinanceListPopAdapter.CMD_MODIFY) {
+        if(FinanceListPopAdapter.selectCmd == FinanceListPopAdapter.CMD_MODIFY ||
+                FinanceListPopAdapter.selectCmd == FinanceListPopAdapter.CMD_TEMPLATE) {
             Finance finance = Finance.getOneFormDb(FinanceList.selectListViewFinanceId);
             this.txtDate.setText(finance.getDate2String());
             this.txtInfo.setText(finance.info);
@@ -54,16 +57,13 @@ public class CreateActivity extends AppCompatActivity {
         this.month = calendar.get(Calendar.MONTH) + 1; // 得到当前月
         this.day = calendar.get(Calendar.DAY_OF_MONTH); // 得到当前日
         this.txtDate.setText(String.format("%d年%02d月%02d日", year, month, day));
-
-//        LinearLayout linearLayout =
-//                (LinearLayout)findViewById(R.id.aaaaa);
-//
-//        Canvas canvas = new Canvas();
-//        ScanRadar scanRadar = new ScanRadar(this);
-//
-//        linearLayout.addView(scanRadar);
-
-
+        if(FinanceListPopAdapter.selectCmd == FinanceListPopAdapter.CMD_MODIFY) {
+            this.txtTitle.setText("修改记账");
+        }else if(FinanceListPopAdapter.selectCmd == FinanceListPopAdapter.CMD_TEMPLATE) {
+            this.txtTitle.setText("模板创建记账");
+        }else {
+            this.txtTitle.setText("创建记账");
+        }
     }
 
     private void initSpinnerType() {
@@ -123,6 +123,7 @@ public class CreateActivity extends AppCompatActivity {
         Intent data = new Intent();
         setResult(RESULT_OK, data);
         finish();
+
     }
 
     public void btn_cancel(View view) {

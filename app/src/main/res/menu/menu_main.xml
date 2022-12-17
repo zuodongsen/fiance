@@ -5,43 +5,50 @@
     <item
         android:id="@+id/menu_inport"
         android:actionLayout="@layout/actionbar_badge_layout"
-        android:alphabeticModifiers="SHIFT"
+        android:icon="?attr/actionModeCopyDrawable"
         android:orderInCategory="1"
         android:title="@string/inport"
         app:showAsAction="never" />
     <item
         android:id="@+id/menu_export"
         android:actionLayout="@layout/actionbar_badge_layout"
+        android:icon="@android:drawable/ic_menu_save"
         android:orderInCategory="2"
         android:title="@string/export"
         app:showAsAction="never" />
     <item
         android:id="@+id/menu_deletebackup"
         android:actionLayout="@layout/actionbar_badge_layout"
+        android:icon="@android:drawable/ic_menu_delete"
         android:orderInCategory="3"
         android:title="@string/deletebackup"
         app:showAsAction="never" />
     <item
         android:id="@+id/menu_uploadbackup"
         android:actionLayout="@layout/actionbar_badge_layout"
+        android:icon="@android:drawable/ic_menu_upload"
         android:orderInCategory="4"
         android:title="@string/uploadbackup"
+        android:tooltipText="0dp"
         app:showAsAction="never" />
     <item
         android:id="@+id/menu_remoteexport"
         android:actionLayout="@layout/actionbar_badge_layout"
+        android:icon="@android:drawable/ic_menu_more"
         android:orderInCategory="5"
         android:title="@string/remoteexport"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
     <item
         android:id="@+id/menu_setftp"
         android:actionLayout="@layout/actionbar_badge_layout"
+        android:icon="@android:drawable/ic_menu_preferences"
         android:orderInCategory="6"
         android:title="@string/setftp"
         app:showAsAction="never" />
     <item
         android:id="@+id/menu_exchange"
         android:actionLayout="@layout/actionbar_badge_layout"
+        android:icon="@android:drawable/ic_popup_sync"
         android:orderInCategory="7"
         android:title="@string/exchange"
         app:showAsAction="never" />
