@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
         this.initHandler();
         this.initStaticValue();
         this.initFileDirc();
+        FtpInfo.init(this);
 
         this.textLogInfo = (TextView)findViewById(R.id.text_logInfo);
 
@@ -143,24 +144,28 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.menu_export) {
             MainActivity.this.exportToFile();
         }else if(id == R.id.menu_remoteexport) {
-            FtpFile ftpList = new FtpFile();
+            FtpFile ftpList = new FtpFile(FtpInfo.serverIp, FtpInfo.serverPort, FtpInfo.usrName, FtpInfo.passwd, FtpInfo.prefix);
             ftpList.doTypeList();
         }else if(id == R.id.menu_setftp) {
-            final EditText inputServer = new EditText(this);
-            inputServer.setFilters(new InputFilter[]{new InputFilter.LengthFilter(50)});
-            inputServer.setText(FtpFile.getHostIp());
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("输入ftp服务器地址").setView(inputServer);
-            builder.setNegativeButton("取消", null);
-            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    String _sign = inputServer.getText().toString();
-                    if(_sign!=null && !_sign.isEmpty()) {
-                        FtpFile.setHostIp(_sign);
-                    }
-                }
-            });
-            builder.show();
+
+            Intent intent = new Intent(this, FtpInfo.class);
+            ((AppCompatActivity)this).startActivityForResult(intent, REQUEST);
+
+//            final EditText inputServer = new EditText(this);
+//            inputServer.setFilters(new InputFilter[]{new InputFilter.LengthFilter(50)});
+//            inputServer.setText(FtpFile.getHostIp());
+//            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//            builder.setTitle("输入ftp服务器地址").setView(inputServer);
+//            builder.setNegativeButton("取消", null);
+//            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int which) {
+//                    String _sign = inputServer.getText().toString();
+//                    if(_sign!=null && !_sign.isEmpty()) {
+//                        FtpFile.setHostIp(_sign);
+//                    }
+//                }
+//            });
+//            builder.show();
         } else if(id == R.id.menu_exchange) {
             this.CRU_SELECT_ACTIVITY = (this.CRU_SELECT_ACTIVITY == CRU_SELECT_ACTIVITY_FRANCE ?
                                         CRU_SELECT_ACTIVITY_FAT : CRU_SELECT_ACTIVITY_FRANCE);
@@ -203,41 +208,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-//    private float touchDownX = 0f;
-//    private float touchUpX = 0f;
-//    private final int TOUCH_MOVE_MIN_X = 100;
-//    @Override
-//    public  boolean onTouchEvent(MotionEvent motionEvent) {
-//        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-//            touchDownX = motionEvent.getX();
-//            return super.onTouchEvent(motionEvent);
-//        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-//            touchUpX = motionEvent.getX();
-//            if (touchUpX - touchDownX > TOUCH_MOVE_MIN_X) {
-//                modifyListViewShowMonth(-1);
-//                reflushListViewData();
-//            } else if (touchDownX - touchUpX > TOUCH_MOVE_MIN_X) {
-//                modifyListViewShowMonth(1);
-//                reflushListViewData();
-//            }
-//        }
-//        return super.onTouchEvent(motionEvent);
-//    }
-
-//    @Override
-//    public Resources getResources() {
-//        Resources resources = super.getResources();
-//        Configuration configuration = resources.getConfiguration();
-//        configuration.setToDefaults();
-//        resources.updateConfiguration(configuration,resources.getDisplayMetrics() );
-//        return resources;
-//    }
-//
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//    }
 
     private void initMenuBar() {
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -282,7 +252,6 @@ public class MainActivity extends AppCompatActivity {
         File fileDir = new File(folder);
         boolean hasDir = fileDir.exists();
         if (!hasDir) {
-            System.out.println("create dirc: " + folder);
             fileDir.mkdirs();// 这里创建的是目录
         }
     }
@@ -315,7 +284,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }else if(mode == FILE_LIST_TYPE_REMOTEINPUT){
-            System.out.println(fileList.length);
             builder.setSingleChoiceItems(fileList, -1, new DialogInterface.OnClickListener(){
                 public void onClick(DialogInterface arg0, int arg1) {
                     MainActivity.selectFileIndexForRemoteInput = arg1;
@@ -337,12 +305,12 @@ public class MainActivity extends AppCompatActivity {
                         FileRWThread.deleteFile(BACKUP_FILE_FOLDER, MainActivity.backupFileNameList.get(it));
                     }
                 }else if(MainActivity.selectFileIndexForUpload != INVALID_FILE_SELECT_ID) {
-                    FtpFile ftpUpload = new FtpFile();
+                    FtpFile ftpUpload = new FtpFile(FtpInfo.serverIp, FtpInfo.serverPort, FtpInfo.usrName, FtpInfo.passwd, FtpInfo.prefix);
                     ftpUpload.doTypeDownOrUpload(BACKUP_FILE_FOLDER + File.separator,
                             MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForUpload),
                             FtpFile.FTP_TYPE_UPLOAD);
                 }else if(MainActivity.selectFileIndexForRemoteInput != INVALID_FILE_SELECT_ID) {
-                    FtpFile ftpFileDownload = new FtpFile();
+                    FtpFile ftpFileDownload = new FtpFile(FtpInfo.serverIp, FtpInfo.serverPort, FtpInfo.usrName, FtpInfo.passwd, FtpInfo.prefix);
                     ftpFileDownload.doTypeDownOrUpload(BACKUP_FILE_FOLDER + File.separator,
                             MainActivity.backupFileNameList.get(MainActivity.selectFileIndexForRemoteInput),
                             FtpFile.FTP_TYPE_DOWNLOAD);
@@ -394,7 +362,6 @@ public class MainActivity extends AppCompatActivity {
                         System.out.println(it);
                         if(it.indexOf(fileNameTag) >= 0) {
                             MainActivity.backupFileNameList.add(it);
-                            System.out.println("add " + it + MainActivity.backupFileNameList.size());
                         }
                     }
                     String[] backupFileNameStrArr = new String[MainActivity.backupFileNameList.size()];

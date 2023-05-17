@@ -235,6 +235,7 @@ public class FinanceList {
             financeList.add(f);
             lastDate = f.date;
         }
+        this.tatalAmount += totalDataAmount;
         if(!financeList.isEmpty()){
             this.financeAdapterList.add(new FinanceAdapter(financeList, DateTimeTrans.getMonthDay2String(lastDate), totalDataAmount, this.context, R.layout.listview_finance, true));
         }

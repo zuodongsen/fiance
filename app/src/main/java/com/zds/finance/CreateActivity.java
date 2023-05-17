@@ -23,11 +23,11 @@ public class CreateActivity extends AppCompatActivity {
     private TextView txtAmount;
     private Spinner spnType;
     public static final String[] amountType = new String[] {
-            "买菜", "水果", "话费", "水费", "电费",
+            "买菜", "水果", "话费", "水费", "电费", "燃气",
             "保险", "交通", "养车", "服装", "长辈",
             "居家", "娃煜", "书籍", "电子", "理财",
             "餐饮", "购物", "旅游", "医疗", "孕期",
-            "潇洒", "其他"};
+            "潇洒", "人情", "其他"};
 
     Calendar calendar = null;
     int year = 0; // 得到当前年

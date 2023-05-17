@@ -32,6 +32,11 @@
     <string name="circle">"跑圈: "</string>
     <string name="notefiance">"记录"</string>
     <string name="statsfiance">"统计"</string>
+    <string name="serverip">"服务器ip"</string>
+    <string name="serverport">"服务器端口"</string>
+    <string name="usr">"用户名"</string>
+    <string name="passwd">"密码"</string>
+    <string name="serverroot">"服务器根目录"</string>
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 </resources>
